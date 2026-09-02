@@ -277,7 +277,16 @@ export const App: React.FC = () => {
     const cleanupRegState = window.pjsip.onRegState((reg: RegStateEvent) => {
       console.log('[APP] Registration event:', reg);
       setIsRegistered(reg.is_registered);
-      setRegistrationStatus(reg.reason || (reg.is_registered ? 'Registered' : 'Disconnected'));
+      if (reg.is_registered) {
+        setRegistrationStatus('Registered');
+      } else {
+        const r = (reg.reason || '').toLowerCase();
+        if (r.includes('gethostbyname') || r.includes('error') || r.includes('failed') || r.includes('timeout') || r.includes('unregistered') || r.includes('disconnect')) {
+          setRegistrationStatus('Unregistered');
+        } else {
+          setRegistrationStatus(reg.reason || 'Unregistered');
+        }
+      }
     });
 
     // Audio devices listener
@@ -635,22 +644,24 @@ export const App: React.FC = () => {
         />
 
         {/* Content Viewport */}
-        <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-6 overflow-y-auto">
+        <main className="flex-1 flex flex-col p-2.5 sm:p-4 md:p-5 overflow-y-auto w-full">
           {activeCall ? (
-            <ActiveCall
-              callId={activeCall.call_id}
-              remoteUri={activeCall.remote_uri}
-              state={activeCall.state}
-              reason={activeCall.reason}
-              lastStatus={activeCall.last_status}
-              onHangup={handleHangup}
-              onMute={handleMute}
-              onHold={handleHold}
-              onSendDtmf={handleSendDtmf}
-              onOpenAudioModal={() => handleOpenSettings('audio')}
-            />
+            <div className="flex-1 flex items-center justify-center">
+              <ActiveCall
+                callId={activeCall.call_id}
+                remoteUri={activeCall.remote_uri}
+                state={activeCall.state}
+                reason={activeCall.reason}
+                lastStatus={activeCall.last_status}
+                onHangup={handleHangup}
+                onMute={handleMute}
+                onHold={handleHold}
+                onSendDtmf={handleSendDtmf}
+                onOpenAudioModal={() => handleOpenSettings('audio')}
+              />
+            </div>
           ) : (
-            <div className="w-full h-full flex flex-col justify-center">
+            <div className="w-full h-full flex flex-col">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   user={user}
@@ -658,10 +669,12 @@ export const App: React.FC = () => {
                   isRegistered={isRegistered}
                   registrationStatus={registrationStatus}
                   history={callHistory}
+                  contacts={contacts}
                   dids={user.dids || []}
                   selectedDidId={selectedDidId}
                   onNavigateTab={handleTabChange}
                   onCall={handleMakeCall}
+                  onOpenSettings={() => handleOpenSettings('audio')}
                 />
               )}
 
