@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { PhoneIncoming, PhoneOff, Check, Terminal, X, Trash2, Settings, Maximize2, Minimize2 } from 'lucide-react';
+import { PhoneIncoming, PhoneOff, Check, Terminal, X, Trash2, Settings } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { BottomNav } from './components/BottomNav';
 import { ProfileMenu, PresenceStatus } from './components/ProfileMenu';
@@ -189,14 +189,20 @@ export const App: React.FC = () => {
   const [settingsDefaultTab, setSettingsDefaultTab] = useState<SettingsTab>('audio');
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
-  const [isWindowMaximized, setIsWindowMaximized] = useState<boolean>(true);
+  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
   const logEndRef = useRef<HTMLDivElement>(null);
 
-  // Check window maximized state on mount
+  // Check window fullscreen state on mount
   useEffect(() => {
-    if (window.pjsip?.isMaximized) {
-      window.pjsip.isMaximized().then((max) => setIsWindowMaximized(max));
+    if (window.pjsip?.isFullScreen) {
+      window.pjsip.isFullScreen().then((fs) => setIsFullScreen(fs));
     }
+    const cleanupFs = window.pjsip?.onFullScreenChange?.((fs) => {
+      setIsFullScreen(fs);
+    });
+    return () => {
+      if (cleanupFs) cleanupFs();
+    };
   }, []);
 
   const handleOpenSettings = (tab: SettingsTab = 'audio') => {
@@ -559,17 +565,30 @@ export const App: React.FC = () => {
     <div className="relative flex flex-col h-screen w-screen bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 overflow-hidden select-none transition-colors duration-200">
       {/* Top Full-Width Window Titlebar & Header */}
       <header className="titlebar-drag flex items-center justify-between px-3 md:px-4 h-11 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-md z-30 shrink-0">
-        {/* macOS Traffic Lights Clearance Spacer */}
-        <div className="flex items-center min-w-0">
-          <div className="w-[72px] shrink-0 pointer-events-none" />
+        {/* Left Branding / macOS Traffic Lights Area */}
+        <div className="flex items-center min-w-0 gap-2">
+          {/* macOS Traffic Lights Clearance Spacer: 72px in windowed/maximized mode, 0 in native fullscreen */}
+          {!isFullScreen && (
+            <div className="w-[72px] shrink-0 pointer-events-none transition-all duration-200" />
+          )}
+
+          {/* TCX Connect App Title */}
+          <div className="flex items-center gap-2 select-none py-1">
+            <span className="font-bold text-xs tracking-tight text-slate-800 dark:text-slate-200">
+              TCX Connect
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 font-semibold font-mono">
+              v1.0
+            </span>
+          </div>
         </div>
 
         <div className="no-drag flex items-center gap-1.5">
-          {/* Live SIP Log Console */}
+          {/* Live SIP Log Console (Mobile Only - Desktop has it in Sidebar) */}
           <button
             onClick={() => setIsLogDrawerOpen(!isLogDrawerOpen)}
             title="Live SIP Log Console"
-            className={`p-1.5 rounded-xl transition-colors cursor-pointer ${isLogDrawerOpen
+            className={`md:hidden p-1.5 rounded-xl transition-colors cursor-pointer ${isLogDrawerOpen
                 ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
@@ -577,11 +596,11 @@ export const App: React.FC = () => {
             <Terminal className="w-4 h-4" />
           </button>
 
-          {/* Preferences & Settings Trigger */}
+          {/* Preferences & Settings Trigger (Mobile Only - Desktop has it in Sidebar) */}
           <button
             onClick={() => handleOpenSettings('audio')}
             title="Preferences & Settings (Audio, Themes, SIP)"
-            className="relative p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="md:hidden relative p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <Settings className="w-4 h-4" />
             <span
@@ -589,20 +608,6 @@ export const App: React.FC = () => {
                 isRegistered ? 'bg-emerald-500' : 'bg-amber-400'
               }`}
             />
-          </button>
-
-          {/* Maximize / Restore Window Toggle */}
-          <button
-            onClick={async () => {
-              if (window.pjsip?.toggleMaximize) {
-                const isMax = await window.pjsip.toggleMaximize();
-                setIsWindowMaximized(isMax);
-              }
-            }}
-            title={isWindowMaximized ? 'Restore Window' : 'Maximize Window'}
-            className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            {isWindowMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
 
           {/* User Profile Badge with Live Presence Indicator */}

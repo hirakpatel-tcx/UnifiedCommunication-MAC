@@ -43,6 +43,18 @@ function createWindow() {
     }
   });
 
+  mainWindow.on('enter-full-screen', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('window:fullscreen_change', true);
+    }
+  });
+
+  mainWindow.on('leave-full-screen', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('window:fullscreen_change', false);
+    }
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -142,6 +154,10 @@ function setupIpcHandlers() {
 
   ipcMain.handle('window:is_maximized', () => {
     return mainWindow ? mainWindow.isMaximized() : false;
+  });
+
+  ipcMain.handle('window:is_fullscreen', () => {
+    return mainWindow ? mainWindow.isFullScreen() : false;
   });
 }
 

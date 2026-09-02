@@ -22,6 +22,8 @@ export interface PjsipApi {
   setAudioDevice: (captureDev: number, playbackDev: number) => Promise<boolean>;
   toggleMaximize?: () => Promise<boolean>;
   isMaximized?: () => Promise<boolean>;
+  isFullScreen?: () => Promise<boolean>;
+  onFullScreenChange?: (callback: (isFullscreen: boolean) => void) => () => void;
   
   onEvent: (callback: (event: any) => void) => () => void;
   onCallState: (callback: (state: any) => void) => () => void;
@@ -44,6 +46,12 @@ const api: PjsipApi = {
   setAudioDevice: (captureDev, playbackDev) => ipcRenderer.invoke('pjsip:set_audio_device', { captureDev, playbackDev }),
   toggleMaximize: () => ipcRenderer.invoke('window:toggle_maximize'),
   isMaximized: () => ipcRenderer.invoke('window:is_maximized'),
+  isFullScreen: () => ipcRenderer.invoke('window:is_fullscreen'),
+  onFullScreenChange: (callback) => {
+    const handler = (_: any, isFs: boolean) => callback(isFs);
+    ipcRenderer.on('window:fullscreen_change', handler);
+    return () => ipcRenderer.removeListener('window:fullscreen_change', handler);
+  },
 
   onEvent: (callback) => {
     const handler = (_: any, data: any) => callback(data);

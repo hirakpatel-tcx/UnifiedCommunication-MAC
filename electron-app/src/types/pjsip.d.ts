@@ -78,6 +78,8 @@ export interface PjsipApi {
   setAudioDevice: (captureDev: number, playbackDev: number) => Promise<boolean>;
   toggleMaximize?: () => Promise<boolean>;
   isMaximized?: () => Promise<boolean>;
+  isFullScreen?: () => Promise<boolean>;
+  onFullScreenChange?: (callback: (isFullscreen: boolean) => void) => () => void;
 
   onEvent: (callback: (event: any) => void) => () => void;
   onCallState: (callback: (state: CallStateEvent) => void) => () => void;
