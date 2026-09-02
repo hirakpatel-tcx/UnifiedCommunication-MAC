@@ -1,5 +1,5 @@
 {
-  "name": "unified-communication-softphone",
+  "name": "tcx-connect",
   "version": "1.0.0",
   "description": "Production-grade VoIP Desktop Softphone powered by Electron, React, and PJSIP 2.17",
   "main": "dist-electron/main.js",

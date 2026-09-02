@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pjsip-daemon CXX)
+project(tcx-connect-daemon CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,7 +27,7 @@ link_directories(
     "${PJSIP_DIR}/third_party/lib"
 )
 
-add_executable(pjsip-daemon src/main.cpp)
+add_executable(tcx-connect-daemon src/main.cpp)
 
 set(PJSIP_LIBS
     pjsua2
@@ -52,10 +52,18 @@ set(PJSIP_LIBS
     pj
 )
 
-target_link_libraries(pjsip-daemon PRIVATE ${PJSIP_LIBS})
+target_link_libraries(tcx-connect-daemon PRIVATE ${PJSIP_LIBS})
 
 if(APPLE)
-    target_link_libraries(pjsip-daemon PRIVATE
+    if(EXISTS "/opt/homebrew/opt/openssl@3")
+        include_directories("/opt/homebrew/opt/openssl@3/include")
+        link_directories("/opt/homebrew/opt/openssl@3/lib")
+    elseif(EXISTS "/usr/local/opt/openssl@3")
+        include_directories("/usr/local/opt/openssl@3/include")
+        link_directories("/usr/local/opt/openssl@3/lib")
+    endif()
+
+    target_link_libraries(tcx-connect-daemon PRIVATE
         "-framework CoreAudio"
         "-framework AudioToolbox"
         "-framework AudioUnit"
@@ -66,11 +74,13 @@ if(APPLE)
         "-framework SystemConfiguration"
         "-framework Foundation"
         "-framework AppKit"
+        ssl
+        crypto
         pthread
         m
     )
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(pjsip-daemon PRIVATE
+    target_link_libraries(tcx-connect-daemon PRIVATE
         pthread
         asound
         ssl
@@ -78,12 +88,12 @@ elseif(UNIX AND NOT APPLE)
         m
     )
 elseif(WIN32)
-    target_link_libraries(pjsip-daemon PRIVATE
+    target_link_libraries(tcx-connect-daemon PRIVATE
         ws2_32
         ole32
     )
 endif()
 
-set_target_properties(pjsip-daemon PROPERTIES
+set_target_properties(tcx-connect-daemon PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
 )

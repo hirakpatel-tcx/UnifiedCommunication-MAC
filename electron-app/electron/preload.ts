@@ -12,7 +12,7 @@ export interface SipAccountConfig {
 export interface PjsipApi {
   register: (config: SipAccountConfig) => Promise<boolean>;
   unregister: () => Promise<boolean>;
-  makeCall: (destination: string) => Promise<boolean>;
+  makeCall: (destination: string, extraHeaders?: Record<string, string>) => Promise<boolean>;
   answerCall: (callId: number) => Promise<boolean>;
   hangupCall: (callId?: number) => Promise<boolean>;
   muteCall: (callId: number, mute: boolean) => Promise<boolean>;
@@ -20,6 +20,8 @@ export interface PjsipApi {
   sendDtmf: (callId: number, digits: string) => Promise<boolean>;
   getAudioDevices: () => Promise<boolean>;
   setAudioDevice: (captureDev: number, playbackDev: number) => Promise<boolean>;
+  toggleMaximize?: () => Promise<boolean>;
+  isMaximized?: () => Promise<boolean>;
   
   onEvent: (callback: (event: any) => void) => () => void;
   onCallState: (callback: (state: any) => void) => () => void;
@@ -32,7 +34,7 @@ export interface PjsipApi {
 const api: PjsipApi = {
   register: (config) => ipcRenderer.invoke('pjsip:register', config),
   unregister: () => ipcRenderer.invoke('pjsip:unregister'),
-  makeCall: (destination) => ipcRenderer.invoke('pjsip:make_call', destination),
+  makeCall: (destination, extraHeaders) => ipcRenderer.invoke('pjsip:make_call', destination, extraHeaders),
   answerCall: (callId) => ipcRenderer.invoke('pjsip:answer', callId),
   hangupCall: (callId) => ipcRenderer.invoke('pjsip:hangup', callId),
   muteCall: (callId, mute) => ipcRenderer.invoke('pjsip:mute', { callId, mute }),
@@ -40,6 +42,8 @@ const api: PjsipApi = {
   sendDtmf: (callId, digits) => ipcRenderer.invoke('pjsip:send_dtmf', { callId, digits }),
   getAudioDevices: () => ipcRenderer.invoke('pjsip:get_audio_devices'),
   setAudioDevice: (captureDev, playbackDev) => ipcRenderer.invoke('pjsip:set_audio_device', { captureDev, playbackDev }),
+  toggleMaximize: () => ipcRenderer.invoke('window:toggle_maximize'),
+  isMaximized: () => ipcRenderer.invoke('window:is_maximized'),
 
   onEvent: (callback) => {
     const handler = (_: any, data: any) => callback(data);

@@ -1,6 +1,6 @@
 {
-  "appId": "com.unifiedcommunication.softphone",
-  "productName": "Unified Softphone",
+  "appId": "com.tcx.connect",
+  "productName": "TCX Connect",
   "directories": {
     "output": "release"
   },
@@ -11,9 +11,9 @@
   ],
   "extraResources": [
     {
-      "from": "../pjsip-daemon/bin",
+      "from": "../tcx-connect-daemon/bin",
       "to": "bin",
-      "filter": ["pjsip-daemon*"]
+      "filter": ["tcx-connect-daemon*", "pjsip-daemon*"]
     }
   ],
   "mac": {

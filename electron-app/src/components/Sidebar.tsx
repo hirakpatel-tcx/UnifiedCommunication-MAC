@@ -1,86 +1,106 @@
 import React from 'react';
-import { Phone, Clock, Users, Settings, Volume2, Terminal, Sun, Moon } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Phone,
+  Clock,
+  Voicemail,
+  MessageSquare,
+  Printer,
+  Users,
+  Settings,
+  Terminal,
+} from 'lucide-react';
+import { UserFeatures } from '../types/auth';
 
-export type NavTab = 'keypad' | 'recents' | 'contacts' | 'settings';
+export type NavTab =
+  | 'dashboard'
+  | 'keypad'
+  | 'recents'
+  | 'contacts'
+  | 'voicemail'
+  | 'messaging'
+  | 'fax';
 
 interface SidebarProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
-  username?: string;
-  isRegistered?: boolean;
-  registrationStatus?: string;
-  theme: 'light' | 'dark';
-  onToggleTheme: () => void;
-  onOpenAudioModal: () => void;
+  onOpenSettings: () => void;
   onOpenLogs: () => void;
   isLogsOpen: boolean;
-  onOpenProfileMenu?: () => void;
+  isRegistered?: boolean;
+  features?: UserFeatures;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
-  theme,
-  onToggleTheme,
-  onOpenAudioModal,
+  onOpenSettings,
   onOpenLogs,
   isLogsOpen,
+  isRegistered,
+  features = { calling: true, fax: false, messaging: false },
 }) => {
-  const navItems = [
-    { id: 'keypad' as NavTab, label: 'Keypad', icon: Phone },
-    { id: 'recents' as NavTab, label: 'Recents', icon: Clock },
-    { id: 'contacts' as NavTab, label: 'Contacts', icon: Users },
-    { id: 'settings' as NavTab, label: 'Settings', icon: Settings },
-  ];
+  // Build navigation items based on user features
+  const navItems: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [];
+
+  // Calling features: Dashboard, Keypad (Dialer), Recents, Voicemail
+  if (features.calling !== false) {
+    navItems.push({ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard });
+    navItems.push({ id: 'keypad', label: 'Dialer', icon: Phone });
+    navItems.push({ id: 'recents', label: 'Recents', icon: Clock });
+    navItems.push({ id: 'voicemail', label: 'Voicemail', icon: Voicemail });
+  }
+
+  // Messaging feature
+  if (features.messaging) {
+    navItems.push({ id: 'messaging', label: 'Messages', icon: MessageSquare });
+  }
+
+  // Fax feature
+  if (features.fax) {
+    navItems.push({ id: 'fax', label: 'Fax', icon: Printer });
+  }
+
+  // Contacts
+  navItems.push({ id: 'contacts', label: 'Contacts', icon: Users });
 
   return (
-    <aside className="hidden md:flex w-16 md:w-18 flex-col items-center justify-between py-4 border-r border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-30 select-none transition-colors">
+    <aside className="hidden md:flex w-16 md:w-18 flex-col items-center justify-between py-2.5 border-r border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-20 select-none transition-colors shrink-0">
       {/* Top Section: Navigation Items */}
-      <div className="flex flex-col items-center gap-6 w-full pt-1">
-        <nav className="flex flex-col items-center gap-2 w-full px-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                title={item.label}
-                className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-150 cursor-pointer ${
-                  isActive
-                    ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-[9px] font-medium mt-0.5 tracking-tight">
-                  {item.label}
-                </span>
-                {isActive && (
-                  <span className="absolute -left-2 top-3 bottom-3 w-1 bg-brand-600 rounded-r-full" />
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+      <nav className="flex flex-col items-center gap-1 w-full px-1.5 overflow-y-auto no-scrollbar py-0.5">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onTabChange(item.id)}
+              title={item.label}
+              className={`relative flex flex-col items-center justify-center w-12 h-11 rounded-xl transition-all duration-150 cursor-pointer shrink-0 ${
+                isActive
+                  ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+              }`}
+            >
+              <Icon className="w-4.5 h-4.5" />
+              <span className="text-[8px] font-medium mt-0.5 tracking-tight truncate max-w-full px-0.5 leading-none">
+                {item.label}
+              </span>
+              {isActive && (
+                <span className="absolute -left-1.5 top-2.5 bottom-2.5 w-1 bg-brand-600 rounded-r-full" />
+              )}
+            </button>
+          );
+        })}
+      </nav>
 
-      {/* Bottom Section: Utility Actions */}
-      <div className="flex flex-col items-center gap-2 w-full px-2 pb-1">
-        {/* Audio Modal Trigger */}
-        <button
-          onClick={onOpenAudioModal}
-          title="Audio Devices (AEC)"
-          className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-        >
-          <Volume2 className="w-4 h-4" />
-        </button>
-
+      {/* Bottom Section: Utility Actions (Terminal & Settings) */}
+      <div className="flex flex-col items-center gap-1.5 w-full px-2 pb-1 shrink-0 pt-2 border-t border-slate-100 dark:border-slate-800/60">
         {/* Live SIP Log Console Trigger */}
         <button
           onClick={onOpenLogs}
           title="Live SIP Log Console"
-          className={`p-2.5 rounded-xl transition-colors cursor-pointer ${
+          className={`p-2 rounded-xl transition-colors cursor-pointer ${
             isLogsOpen
               ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -89,16 +109,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Terminal className="w-4 h-4" />
         </button>
 
-        {/* Theme Switcher (Light / Dark) */}
+        {/* Settings & Preferences Button */}
         <button
-          onClick={onToggleTheme}
-          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          onClick={onOpenSettings}
+          title="Preferences & Settings (Audio, Themes, SIP)"
+          className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
         >
-          {theme === 'dark' ? (
-            <Sun className="w-4 h-4 text-amber-400" />
-          ) : (
-            <Moon className="w-4 h-4 text-slate-700" />
+          <Settings className="w-4 h-4" />
+          {isRegistered !== undefined && (
+            <span
+              className={`absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full ${
+                isRegistered ? 'bg-emerald-500' : 'bg-amber-400'
+              }`}
+            />
           )}
         </button>
       </div>

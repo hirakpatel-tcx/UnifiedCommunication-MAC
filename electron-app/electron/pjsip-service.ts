@@ -24,6 +24,8 @@ export class PjsipService extends EventEmitter {
   private process: ChildProcessWithoutNullStreams | null = null;
   private readlineInterface: readline.Interface | null = null;
   private isShuttingDown = false;
+  private isReady = false;
+  private pendingCommands: Array<{ command: string; params: Record<string, any> }> = [];
   private restartAttempts = 0;
   private maxRestarts = 5;
   private restartTimeout: NodeJS.Timeout | null = null;
@@ -39,21 +41,33 @@ export class PjsipService extends EventEmitter {
     return PjsipService.instance;
   }
 
+  public getIsReady(): boolean {
+    return this.isReady;
+  }
+
   /**
-   * Resolves the correct path to the pjsip-daemon binary.
+   * Resolves the correct path to the tcx-connect-daemon binary.
    */
   private getBinaryPath(): string {
     const isPackaged = app.isPackaged;
+    const exeName = 'tcx-connect-daemon';
+    const legacyName = 'pjsip-daemon';
     let binaryPath: string;
 
     if (isPackaged) {
-      binaryPath = path.join(process.resourcesPath, 'bin', 'pjsip-daemon');
+      binaryPath = path.join(process.resourcesPath, 'bin', exeName);
+      if (!fs.existsSync(binaryPath) && fs.existsSync(path.join(process.resourcesPath, 'bin', legacyName))) {
+        binaryPath = path.join(process.resourcesPath, 'bin', legacyName);
+      }
     } else {
-      // In development: look in pjsip-daemon/bin/ relative to project root
-      binaryPath = path.resolve(__dirname, '../../pjsip-daemon/bin/pjsip-daemon');
+      // In development: look in tcx-connect-daemon/bin/ relative to project root
+      binaryPath = path.resolve(__dirname, `../../tcx-connect-daemon/bin/${exeName}`);
+      if (!fs.existsSync(binaryPath) && fs.existsSync(path.resolve(__dirname, `../../pjsip-daemon/bin/${legacyName}`))) {
+        binaryPath = path.resolve(__dirname, `../../pjsip-daemon/bin/${legacyName}`);
+      }
     }
 
-    if (process.platform === 'win32') {
+    if (process.platform === 'win32' && !binaryPath.endsWith('.exe')) {
       binaryPath += '.exe';
     }
 
@@ -61,19 +75,19 @@ export class PjsipService extends EventEmitter {
   }
 
   /**
-   * Starts the pjsip-daemon child process.
+   * Starts the tcx-connect-daemon child process.
    */
   public start(): void {
     if (this.process) {
-      console.log('[PJSIP-Service] Daemon already running.');
+      console.log('[TCX-Service] Daemon already running.');
       return;
     }
 
     const binaryPath = this.getBinaryPath();
-    console.log(`[PJSIP-Service] Launching daemon at: ${binaryPath}`);
+    console.log(`[TCX-Service] Launching daemon at: ${binaryPath}`);
 
     if (!fs.existsSync(binaryPath)) {
-      const err = new Error(`pjsip-daemon binary not found at ${binaryPath}. Make sure to build it first.`);
+      const err = new Error(`tcx-connect-daemon binary not found at ${binaryPath}. Make sure to build it first.`);
       console.error(err.message);
       this.emit('daemon_error', { event: 'error', message: err.message, code: 404 });
       return;
@@ -98,6 +112,11 @@ export class PjsipService extends EventEmitter {
 
         try {
           const eventData: PjsipEvent = JSON.parse(trimmed);
+          if (eventData.event === 'ready') {
+            this.isReady = true;
+            console.log('[TCX-Service] Daemon reported READY. Flushing queued commands if any...');
+            this.flushPendingCommands();
+          }
           this.emit('event', eventData);
           if (eventData.event) {
             this.emit(eventData.event, eventData);
@@ -120,6 +139,7 @@ export class PjsipService extends EventEmitter {
         console.log(`[PJSIP-Service] Daemon process exited with code ${code}, signal: ${signal}`);
         this.process = null;
         this.readlineInterface = null;
+        this.isReady = false;
 
         this.emit('daemon_status', { isRunning: false, code, signal });
 
@@ -148,13 +168,26 @@ export class PjsipService extends EventEmitter {
     }
   }
 
+  private flushPendingCommands(): void {
+    if (!this.process || !this.process.stdin.writable) return;
+    while (this.pendingCommands.length > 0) {
+      const item = this.pendingCommands.shift();
+      if (item) {
+        console.log(`[TCX-Service] Executing queued command: ${item.command}`);
+        const payload = JSON.stringify({ command: item.command, params: item.params }) + '\n';
+        this.process.stdin.write(payload);
+      }
+    }
+  }
+
   /**
    * Writes a JSON command line to the daemon's stdin.
    */
   public sendCommand(command: string, params: Record<string, any> = {}): boolean {
-    if (!this.process || !this.process.stdin.writable) {
-      console.error('[PJSIP-Service] Cannot send command, stdin is not writable');
-      return false;
+    if (!this.process || !this.process.stdin.writable || !this.isReady) {
+      console.log(`[TCX-Service] Daemon not ready yet. Queuing command: ${command}`);
+      this.pendingCommands.push({ command, params });
+      return true;
     }
 
     const payload = JSON.stringify({ command, params }) + '\n';
@@ -171,8 +204,12 @@ export class PjsipService extends EventEmitter {
     return this.sendCommand('unregister');
   }
 
-  public makeCall(destination: string): boolean {
-    return this.sendCommand('make_call', { destination });
+  public makeCall(destination: string, extraHeaders?: Record<string, string>): boolean {
+    return this.sendCommand('make_call', {
+      destination,
+      extra_headers: extraHeaders,
+      extraHeader: extraHeaders,
+    });
   }
 
   public answerCall(callId: number): boolean {

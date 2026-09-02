@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Check, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Check, CheckCircle2, ChevronRight, LogOut, Building2, Phone, Sparkles, Settings } from 'lucide-react';
+import { AuthUser, UserFeatures } from '../types/auth';
 
 export type PresenceStatus = 'available' | 'busy' | 'away' | 'dnd';
 
@@ -15,6 +16,7 @@ interface ProfileMenuProps {
   onChangePresence: (presence: PresenceStatus) => void;
   onViewProfile: () => void;
   onSignOut: () => void;
+  authUser?: AuthUser | null;
 }
 
 export const ProfileMenu: React.FC<ProfileMenuProps> = ({
@@ -28,6 +30,7 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
   onChangePresence,
   onViewProfile,
   onSignOut,
+  authUser,
 }) => {
   const [showStatusSubmenu, setShowStatusSubmenu] = useState<boolean>(false);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
@@ -85,16 +88,28 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
     setTimeout(() => setUpdateMessage(null), 3500);
   };
 
+  const email = authUser?.email || username;
+  const role = authUser?.role;
+  const tenantName = authUser?.tenant?.tenant_name;
+  const tenantCode = authUser?.tenant?.tenant_code;
+  const extensionNum = authUser?.extension?.extension_number || username;
+  const features: UserFeatures = authUser?.features || {
+    calling: true,
+    fax: false,
+    messaging: false,
+    voicemail: false,
+  };
+
   return (
     <div
       ref={menuRef}
-      className="absolute top-13 right-3 w-72 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-750 shadow-2xl z-50 overflow-hidden text-slate-800 dark:text-slate-100 select-none animate-fadeIn transition-colors duration-150"
+      className="absolute top-13 right-3 w-80 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-750 shadow-2xl z-50 overflow-hidden text-slate-800 dark:text-slate-100 select-none animate-fadeIn transition-colors duration-150"
     >
       {/* Top Section: Avatar & User Identity */}
-      <div className="p-4 flex items-start gap-3.5 border-b border-slate-200 dark:border-slate-800">
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full bg-slate-900 text-white font-bold text-base flex items-center justify-center shadow-md border border-slate-700">
-            {getInitials(displayName || username)}
+      <div className="p-4 flex items-start gap-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+        <div className="relative shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white font-bold text-base flex items-center justify-center shadow-md">
+            {getInitials(displayName || email)}
           </div>
           {/* Presence Ring */}
           <span
@@ -105,22 +120,64 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate leading-tight">
-            {displayName || 'Hirak Patel'}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mb-1.5 font-mono">
-            {username}@{server}
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-tight">
+              {displayName || email.split('@')[0]}
+            </h3>
+            {role && (
+              <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-md font-bold bg-brand-500/10 text-brand-600 dark:text-brand-400">
+                {role}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-mono">
+            {email}
           </p>
-          <button
-            onClick={() => {
-              onViewProfile();
-              onClose();
-            }}
-            className="inline-flex items-center px-2.5 py-0.5 rounded-md border border-blue-500/70 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 text-xs font-semibold transition-colors cursor-pointer"
-          >
-            View profile
-          </button>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate font-mono">
+            SIP: {authUser?.effective_sip_domain || authUser?.sip_domain || authUser?.tenant?.sip_domain || authUser?.extension?.sip_server || server}
+          </p>
+
+          {/* Tenant & Ext Badge */}
+          <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            {tenantCode && (
+              <span className="flex items-center gap-1 truncate" title={tenantName || tenantCode}>
+                <Building2 className="w-3 h-3 text-brand-500 shrink-0" />
+                <span className="truncate">{tenantName || tenantCode}</span>
+              </span>
+            )}
+            <span className="flex items-center gap-1 font-mono shrink-0">
+              <Phone className="w-3 h-3 text-emerald-500" />
+              <span>Ext: {extensionNum}</span>
+            </span>
+          </div>
         </div>
+      </div>
+
+      {/* Enabled Features Pill Row */}
+      <div className="px-4 py-2 bg-slate-100/60 dark:bg-slate-850/40 border-b border-slate-200 dark:border-slate-800 flex items-center gap-1.5 flex-wrap">
+        <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mr-1">
+          Features:
+        </span>
+        {features.calling && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">
+            Calling
+          </span>
+        )}
+        {features.voicemail && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium">
+            Voicemail
+          </span>
+        )}
+        {features.fax && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium">
+            Fax
+          </span>
+        )}
+        {features.messaging && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium">
+            Messaging
+          </span>
+        )}
       </div>
 
       {/* Share Status Section */}
@@ -175,12 +232,24 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
         </div>
       </div>
 
-      {/* Check for updates & Sign out (NO Add Account) */}
-      <div className="p-1.5">
+      {/* Account Settings, Check for updates & Sign out */}
+      <div className="p-1.5 space-y-0.5">
+        <button
+          onClick={() => {
+            onViewProfile();
+            onClose();
+          }}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+        >
+          <Settings className="w-4 h-4 text-slate-400" />
+          <span>Settings & Preferences</span>
+        </button>
+
         <button
           onClick={handleCheckUpdates}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
         >
+          <Sparkles className="w-4 h-4 text-amber-500" />
           <span>Check for updates</span>
         </button>
 
@@ -195,8 +264,9 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
             onSignOut();
             onClose();
           }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
         >
+          <LogOut className="w-4 h-4" />
           <span>Sign out</span>
         </button>
       </div>

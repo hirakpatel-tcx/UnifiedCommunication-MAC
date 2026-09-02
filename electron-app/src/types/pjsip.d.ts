@@ -68,7 +68,7 @@ export interface DaemonStatusEvent {
 export interface PjsipApi {
   register: (config: SipAccountConfig) => Promise<boolean>;
   unregister: () => Promise<boolean>;
-  makeCall: (destination: string) => Promise<boolean>;
+  makeCall: (destination: string, extraHeaders?: Record<string, string>) => Promise<boolean>;
   answerCall: (callId: number) => Promise<boolean>;
   hangupCall: (callId?: number) => Promise<boolean>;
   muteCall: (callId: number, mute: boolean) => Promise<boolean>;
@@ -76,6 +76,8 @@ export interface PjsipApi {
   sendDtmf: (callId: number, digits: string) => Promise<boolean>;
   getAudioDevices: () => Promise<boolean>;
   setAudioDevice: (captureDev: number, playbackDev: number) => Promise<boolean>;
+  toggleMaximize?: () => Promise<boolean>;
+  isMaximized?: () => Promise<boolean>;
 
   onEvent: (callback: (event: any) => void) => () => void;
   onCallState: (callback: (state: CallStateEvent) => void) => () => void;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { PhoneIncoming, PhoneOff, Check, Terminal, X, Trash2, Sun, Moon } from 'lucide-react';
+import { PhoneIncoming, PhoneOff, Check, Terminal, X, Trash2, Settings, Maximize2, Minimize2 } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { BottomNav } from './components/BottomNav';
 import { ProfileMenu, PresenceStatus } from './components/ProfileMenu';
@@ -7,8 +7,12 @@ import { Dialpad } from './components/Dialpad';
 import { ActiveCall } from './components/ActiveCall';
 import { CallHistory } from './components/CallHistory';
 import { Contacts } from './components/Contacts';
-import { SipAccountModal } from './components/SipAccountModal';
-import { AudioDeviceModal } from './components/AudioDeviceModal';
+import { SettingsModal, SettingsTab } from './components/SettingsModal';
+import { LoginScreen } from './components/LoginScreen';
+import { DashboardView } from './components/DashboardView';
+import { VoicemailView } from './components/VoicemailView';
+import { MessagingView } from './components/MessagingView';
+import { FaxView } from './components/FaxView';
 import {
   SipAccountConfig,
   AudioDevice,
@@ -19,21 +23,30 @@ import {
   CallRecord,
   Contact,
 } from './types/pjsip';
+import { AuthSession, LoginResponse } from './types/auth';
+import {
+  getStoredAuthSession,
+  clearAuthSession,
+  logoutUser,
+  extensionToSipConfig,
+  getStoredBaseUrl,
+  extract10DigitCID,
+} from './services/auth';
 import { startRinger, stopRinger } from './utils/audio-tones';
 
 export const DEFAULT_SIP_CONFIG: SipAccountConfig = {
-  server: 'sip.linphone.org',
-  port: 5060,
+  server: import.meta.env.VITE_SIP_DOMAIN || '127.0.0.1',
+  port: 5061,
   username: 'hirakpatel',
   auth_id: 'hirakpatel',
   password: '',
-  transport: 'tcp',
+  transport: 'tls',
 };
 
 const INITIAL_CONTACTS: Contact[] = [
   { id: '1', name: 'Linphone Echo Test', number: 'sip:echo@sip.linphone.org', company: 'Belledonne Communications' },
   { id: '2', name: 'FreeSWITCH Echo Test', number: '8004444444', company: 'FreeSWITCH IVR' },
-  { id: '3', name: 'Sales & Support', number: '900', company: 'Unified Comm' },
+  { id: '3', name: 'Sales & Support', number: '900', company: 'TCX Connect' },
 ];
 
 export const App: React.FC = () => {
@@ -57,14 +70,77 @@ export const App: React.FC = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  const handleSetTheme = (newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
+  };
+
+  // Authentication State
+  const [authSession, setAuthSession] = useState<AuthSession | null>(() => getStoredAuthSession());
+
+  // Selected Outbound Caller ID / DID State
+  const [selectedDidId, setSelectedDidId] = useState<string | null>(() => {
+    const saved = localStorage.getItem('selected_did_id');
+    if (saved) return saved;
+    const stored = getStoredAuthSession();
+    const availableDids = stored?.user?.dids?.filter((d) => d.calling_enabled !== false) || [];
+    return availableDids.length > 0 ? availableDids[0].id : null;
+  });
+
+  useEffect(() => {
+    if (selectedDidId) {
+      localStorage.setItem('selected_did_id', selectedDidId);
+    } else {
+      localStorage.removeItem('selected_did_id');
+    }
+  }, [selectedDidId]);
+
   // Navigation Tab
-  const [activeTab, setActiveTab] = useState<NavTab>('keypad');
+  const [activeTab, setActiveTab] = useState<NavTab>(() => {
+    const session = getStoredAuthSession();
+    if (session?.user?.features) {
+      if (session.user.features.calling !== false) return 'dashboard';
+      if (session.user.features.messaging) return 'messaging';
+      if (session.user.features.fax) return 'fax';
+    }
+    return 'dashboard';
+  });
+
+  // Ensure activeTab is valid if user features change
+  useEffect(() => {
+    if (!authSession?.user?.features) return;
+    const f = authSession.user.features;
+    const callingTabs: NavTab[] = ['dashboard', 'keypad', 'recents', 'voicemail'];
+    if (!f.calling && callingTabs.includes(activeTab)) {
+      if (f.messaging) {
+        setActiveTab('messaging');
+      } else if (f.fax) {
+        setActiveTab('fax');
+      } else {
+        setActiveTab('contacts');
+      }
+    } else if (activeTab === 'fax' && !f.fax) {
+      setActiveTab(f.calling ? 'dashboard' : f.messaging ? 'messaging' : 'contacts');
+    } else if (activeTab === 'messaging' && !f.messaging) {
+      setActiveTab(f.calling ? 'dashboard' : f.fax ? 'fax' : 'contacts');
+    }
+  }, [authSession?.user?.features, activeTab]);
 
   // Application State
   const [isDaemonRunning, setIsDaemonRunning] = useState<boolean>(false);
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
   const [registrationStatus, setRegistrationStatus] = useState<string>('Unregistered');
-  const [currentAccount, setCurrentAccount] = useState<SipAccountConfig | null>(DEFAULT_SIP_CONFIG);
+  const [currentAccount, setCurrentAccount] = useState<SipAccountConfig | null>(() => {
+    const stored = getStoredAuthSession();
+    if (stored?.user?.extension) {
+      return extensionToSipConfig(stored.user, stored.savedPassword);
+    }
+    try {
+      const savedConfig = localStorage.getItem('pjsip_account_config');
+      return savedConfig ? JSON.parse(savedConfig) : DEFAULT_SIP_CONFIG;
+    } catch {
+      return DEFAULT_SIP_CONFIG;
+    }
+  });
 
   // Call State
   const [activeCall, setActiveCall] = useState<CallStateEvent | null>(null);
@@ -109,11 +185,25 @@ export const App: React.FC = () => {
   // Modals & Drawers
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
   const [presence, setPresence] = useState<PresenceStatus>('available');
-  const [isAccountModalOpen, setIsAccountModalOpen] = useState<boolean>(false);
-  const [isAudioModalOpen, setIsAudioModalOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [settingsDefaultTab, setSettingsDefaultTab] = useState<SettingsTab>('audio');
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [isWindowMaximized, setIsWindowMaximized] = useState<boolean>(true);
   const logEndRef = useRef<HTMLDivElement>(null);
+
+  // Check window maximized state on mount
+  useEffect(() => {
+    if (window.pjsip?.isMaximized) {
+      window.pjsip.isMaximized().then((max) => setIsWindowMaximized(max));
+    }
+  }, []);
+
+  const handleOpenSettings = (tab: SettingsTab = 'audio') => {
+    window.pjsip?.getAudioDevices();
+    setSettingsDefaultTab(tab);
+    setIsSettingsOpen(true);
+  };
 
   // Auto-scroll logs to bottom
   useEffect(() => {
@@ -121,32 +211,6 @@ export const App: React.FC = () => {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [logs, isLogDrawerOpen]);
-
-  // Load saved credentials or initialize with default credentials on startup
-  useEffect(() => {
-    try {
-      const savedConfig = localStorage.getItem('pjsip_account_config');
-      if (savedConfig) {
-        const config: SipAccountConfig = JSON.parse(savedConfig);
-        if (config.username === '901-iHDT' || config.server === 'fs1.ihs.host') {
-          setCurrentAccount(DEFAULT_SIP_CONFIG);
-          localStorage.setItem('pjsip_account_config', JSON.stringify(DEFAULT_SIP_CONFIG));
-          setIsAccountModalOpen(true);
-        } else {
-          setCurrentAccount(config);
-          if (!config.password) {
-            setIsAccountModalOpen(true);
-          }
-        }
-      } else {
-        setCurrentAccount(DEFAULT_SIP_CONFIG);
-        localStorage.setItem('pjsip_account_config', JSON.stringify(DEFAULT_SIP_CONFIG));
-        setIsAccountModalOpen(true);
-      }
-    } catch {
-      setCurrentAccount(DEFAULT_SIP_CONFIG);
-    }
-  }, []);
 
   // Listen to PJSIP events from Electron preload bridge
   useEffect(() => {
@@ -233,25 +297,46 @@ export const App: React.FC = () => {
       setLogs((prev) => [...prev.slice(-200), logText.trim()]);
     });
 
+    // Connect and register SIP extension for logged-in user or stored configuration
+    const connectSipAccount = () => {
+      if (!window.pjsip) return;
+      try {
+        const session = getStoredAuthSession();
+        if (session?.user?.extension) {
+          const sipConfig = extensionToSipConfig(session.user, session.savedPassword);
+          if (sipConfig.password && sipConfig.password.trim().length > 0) {
+            console.log('[App] Auto-connecting SIP for logged-in user:', sipConfig.username, 'to', sipConfig.server);
+            setCurrentAccount(sipConfig);
+            setRegistrationStatus('Registering...');
+            window.pjsip.register(sipConfig);
+            return;
+          }
+        }
+
+        // Fallback: stored manual config
+        const savedConfig = localStorage.getItem('pjsip_account_config');
+        if (savedConfig) {
+          const config: SipAccountConfig = JSON.parse(savedConfig);
+          if (config.password && config.password.trim().length > 0) {
+            console.log('[App] Auto-connecting SIP using stored config:', config.username);
+            setCurrentAccount(config);
+            setRegistrationStatus('Registering...');
+            window.pjsip.register(config);
+          }
+        }
+      } catch (e) {
+        console.error('[App] Auto-connect error:', e);
+      }
+    };
+
+    // Auto-connect immediately on listener mount if user is authenticated
+    connectSipAccount();
+
     // Generic events
     const cleanupEvent = window.pjsip.onEvent((evt) => {
       if (evt.event === 'ready') {
         setIsDaemonRunning(true);
-        // Auto-register with saved credentials or defaults if password is present
-        try {
-          const savedConfig = localStorage.getItem('pjsip_account_config');
-          const config = savedConfig ? JSON.parse(savedConfig) : DEFAULT_SIP_CONFIG;
-          if (config.password && config.password.trim().length > 0) {
-            setRegistrationStatus('Registering...');
-            window.pjsip?.register(config);
-          } else {
-            setRegistrationStatus('Enter Password');
-          }
-        } catch {
-          if (DEFAULT_SIP_CONFIG.password) {
-            window.pjsip?.register(DEFAULT_SIP_CONFIG);
-          }
-        }
+        connectSipAccount();
       }
     });
 
@@ -266,19 +351,90 @@ export const App: React.FC = () => {
     };
   }, [activeCall]);
 
-  // Softphone Actions
-  const handleMakeCall = useCallback((destination: string) => {
-    if (!window.pjsip) return;
-    window.pjsip.makeCall(destination);
-    callStartTimeRef.current = 0;
-    // Optimistic active call state
-    setActiveCall({
-      event: 'call_state',
-      call_id: 0,
-      state: 'CALLING',
-      remote_uri: destination,
-    });
-  }, []);
+  // Handle Login Success
+  const handleLoginSuccess = (loginResponse: LoginResponse, password?: string) => {
+    const session: AuthSession = {
+      accessToken: loginResponse.access,
+      refreshToken: loginResponse.refresh,
+      user: loginResponse.user,
+      baseUrl: getStoredBaseUrl(),
+      savedPassword: password,
+    };
+    setAuthSession(session);
+
+    // Auto-select first calling-enabled DID if available
+    const availableDids = loginResponse.user.dids?.filter((d) => d.calling_enabled !== false) || [];
+    if (availableDids.length > 0 && !selectedDidId) {
+      setSelectedDidId(availableDids[0].id);
+    }
+
+    // Auto-configure & register SIP extension
+    if (loginResponse.user.extension) {
+      const sipConfig = extensionToSipConfig(loginResponse.user, password);
+      setCurrentAccount(sipConfig);
+      if (sipConfig.password && sipConfig.password.trim().length > 0) {
+        setRegistrationStatus('Registering...');
+        window.pjsip?.register(sipConfig);
+      } else {
+        setRegistrationStatus('Enter Password');
+        handleOpenSettings('sip');
+      }
+    }
+  };
+
+  // Handle Sign Out
+  const handleSignOut = () => {
+    // Notify backend to blacklist refresh token
+    const token = authSession?.refreshToken;
+    const url = authSession?.baseUrl;
+    if (token) {
+      logoutUser(token, url).catch(() => {});
+    }
+
+    clearAuthSession();
+    window.pjsip?.unregister();
+    setIsRegistered(false);
+    setRegistrationStatus('Unregistered');
+    setAuthSession(null);
+    setSelectedDidId(null);
+    setIsProfileMenuOpen(false);
+    setIsSettingsOpen(false);
+    setActiveCall(null);
+    setIncomingCall(null);
+  };
+
+  // Softphone Actions with X-OverrideCID
+  const handleMakeCall = useCallback(
+    (destination: string) => {
+      if (!window.pjsip) return;
+
+      // Extract 10-digit CID from selected DID
+      let extraHeaders: Record<string, string> | undefined = undefined;
+      if (authSession?.user?.dids && selectedDidId) {
+        const did = authSession.user.dids.find((d) => d.id === selectedDidId);
+        if (did) {
+          const tenDigitCid = extract10DigitCID(did.number || did.did_number || '');
+          if (tenDigitCid) {
+            extraHeaders = {
+              'X-OverrideCID': tenDigitCid,
+            };
+            console.log('[APP] Initiating call with X-OverrideCID:', tenDigitCid);
+          }
+        }
+      }
+
+      window.pjsip.makeCall(destination, extraHeaders);
+      callStartTimeRef.current = 0;
+      // Optimistic active call state
+      setActiveCall({
+        event: 'call_state',
+        call_id: 0,
+        state: 'CALLING',
+        remote_uri: destination,
+      });
+    },
+    [authSession, selectedDidId]
+  );
 
   const handleAnswerCall = (callId: number) => {
     stopRinger();
@@ -337,12 +493,12 @@ export const App: React.FC = () => {
     setCurrentAccount(config);
     setRegistrationStatus('Registering...');
     window.pjsip?.register(config);
-    setIsAccountModalOpen(false);
+    setIsSettingsOpen(false);
   };
 
   const handleUnregister = () => {
     window.pjsip?.unregister();
-    setIsAccountModalOpen(false);
+    setIsSettingsOpen(false);
   };
 
   const handleSelectAudioDevices = (captureDev: number, playbackDev: number) => {
@@ -372,87 +528,111 @@ export const App: React.FC = () => {
   };
 
   const handleTabChange = (tab: NavTab) => {
-    if (tab === 'settings') {
-      setIsAccountModalOpen(true);
-    } else {
-      setActiveTab(tab);
-    }
+    setActiveTab(tab);
   };
 
-  return (
-    <div className="relative flex flex-col md:flex-row h-screen w-screen bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 overflow-hidden select-none transition-colors duration-200">
-      {/* Desktop Left Sidebar Rail (hidden in mini mode) */}
-      <Sidebar
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
+  // If not authenticated, render Login Screen
+  if (!authSession) {
+    return (
+      <LoginScreen
+        onLoginSuccess={handleLoginSuccess}
         theme={theme}
         onToggleTheme={toggleTheme}
-        onOpenAudioModal={() => {
-          window.pjsip?.getAudioDevices();
-          setIsAudioModalOpen(true);
-        }}
-        onOpenLogs={() => setIsLogDrawerOpen(!isLogDrawerOpen)}
-        isLogsOpen={isLogDrawerOpen}
       />
+    );
+  }
 
-      {/* Main App Canvas */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* macOS Titlebar & Header */}
-        <header className="titlebar-drag flex items-center justify-between px-3 md:px-4 h-12 border-b border-slate-200 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md z-20">
-          <div className="flex items-center gap-2.5 pl-16 md:pl-0">
-            <h1 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              {activeCall ? 'In Call' : activeTab === 'keypad' ? 'Dialer' : activeTab === 'recents' ? 'Recents' : 'Contacts'}
-            </h1>
-          </div>
+  const user = authSession.user;
+  const displayName = user.email.split('@')[0];
+  const extensionNum = user.extension?.extension_number || currentAccount?.username || 'hirakpatel';
 
-          <div className="no-drag flex items-center gap-2">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-            </button>
+  return (
+    <div className="relative flex flex-col h-screen w-screen bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 overflow-hidden select-none transition-colors duration-200">
+      {/* Top Full-Width Window Titlebar & Header */}
+      <header className="titlebar-drag flex items-center justify-between px-3 md:px-4 h-11 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-md z-30 shrink-0">
+        {/* macOS Traffic Lights Clearance Spacer */}
+        <div className="flex items-center min-w-0">
+          <div className="w-[72px] shrink-0 pointer-events-none" />
+        </div>
 
-            {/* Live SIP Log Console */}
-            <button
-              onClick={() => setIsLogDrawerOpen(!isLogDrawerOpen)}
-              title="Live SIP Log Console"
-              className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
-                isLogDrawerOpen
-                  ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
+        <div className="no-drag flex items-center gap-1.5">
+          {/* Live SIP Log Console */}
+          <button
+            onClick={() => setIsLogDrawerOpen(!isLogDrawerOpen)}
+            title="Live SIP Log Console"
+            className={`p-1.5 rounded-xl transition-colors cursor-pointer ${isLogDrawerOpen
+                ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
-            >
-              <Terminal className="w-4 h-4" />
-            </button>
+          >
+            <Terminal className="w-4 h-4" />
+          </button>
 
-            {/* User Profile Badge with Live Presence Indicator */}
-            <button
-              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              title={isRegistered ? `Hirak Patel (${presence})` : isDaemonRunning ? registrationStatus || 'Unregistered' : 'Connecting to PJSIP...'}
-              className="relative group p-0.5 rounded-xl transition-transform hover:scale-105 cursor-pointer ml-1"
-            >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-xs">
-                {(currentAccount?.username || 'HP').slice(0, 2).toUpperCase()}
-              </div>
-              <span
-                className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 ${
-                  isRegistered
-                    ? presence === 'available'
-                      ? 'bg-emerald-500 ring-1 ring-emerald-500/40'
-                      : presence === 'busy' || presence === 'dnd'
+          {/* Preferences & Settings Trigger */}
+          <button
+            onClick={() => handleOpenSettings('audio')}
+            title="Preferences & Settings (Audio, Themes, SIP)"
+            className="relative p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <Settings className="w-4 h-4" />
+            <span
+              className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ${
+                isRegistered ? 'bg-emerald-500' : 'bg-amber-400'
+              }`}
+            />
+          </button>
+
+          {/* Maximize / Restore Window Toggle */}
+          <button
+            onClick={async () => {
+              if (window.pjsip?.toggleMaximize) {
+                const isMax = await window.pjsip.toggleMaximize();
+                setIsWindowMaximized(isMax);
+              }
+            }}
+            title={isWindowMaximized ? 'Restore Window' : 'Maximize Window'}
+            className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            {isWindowMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+
+          {/* User Profile Badge with Live Presence Indicator */}
+          <button
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            title={isRegistered ? `${displayName} (${presence})` : isDaemonRunning ? registrationStatus || 'Unregistered' : 'Connecting to PJSIP...'}
+            className="relative group p-0.5 rounded-xl transition-transform hover:scale-105 cursor-pointer ml-1"
+          >
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+              {(displayName || 'HP').slice(0, 2).toUpperCase()}
+            </div>
+            <span
+              className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 ${isRegistered
+                  ? presence === 'available'
+                    ? 'bg-emerald-500 ring-1 ring-emerald-500/40'
+                    : presence === 'busy' || presence === 'dnd'
                       ? 'bg-rose-500 ring-1 ring-rose-500/40'
                       : 'bg-amber-400 ring-1 ring-amber-400/40'
-                    : registrationStatus.toLowerCase().includes('reg')
+                  : registrationStatus.toLowerCase().includes('reg')
                     ? 'bg-amber-400 animate-pulse'
                     : 'bg-slate-400'
                 }`}
-              />
-            </button>
-          </div>
-        </header>
+            />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Body: Desktop Left Sidebar + Content Viewport */}
+      <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden">
+        {/* Desktop Left Sidebar Rail with bottom settings trigger */}
+        <Sidebar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          onOpenSettings={() => handleOpenSettings('audio')}
+          onOpenLogs={() => setIsLogDrawerOpen(!isLogDrawerOpen)}
+          isLogsOpen={isLogDrawerOpen}
+          isRegistered={isRegistered}
+          features={user.features}
+        />
 
         {/* Content Viewport */}
         <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-6 overflow-y-auto">
@@ -467,16 +647,33 @@ export const App: React.FC = () => {
               onMute={handleMute}
               onHold={handleHold}
               onSendDtmf={handleSendDtmf}
-              onOpenAudioModal={() => setIsAudioModalOpen(true)}
+              onOpenAudioModal={() => handleOpenSettings('audio')}
             />
           ) : (
             <div className="w-full h-full flex flex-col justify-center">
+              {activeTab === 'dashboard' && (
+                <DashboardView
+                  user={user}
+                  account={currentAccount}
+                  isRegistered={isRegistered}
+                  registrationStatus={registrationStatus}
+                  history={callHistory}
+                  dids={user.dids || []}
+                  selectedDidId={selectedDidId}
+                  onNavigateTab={handleTabChange}
+                  onCall={handleMakeCall}
+                />
+              )}
+
               {activeTab === 'keypad' && (
                 <Dialpad
                   onCall={handleMakeCall}
-                  callingFrom={`${currentAccount?.username || 'hirakpatel'} (${currentAccount?.server || 'sip.linphone.org'})`}
-                  onOpenSettings={() => setIsAccountModalOpen(true)}
+                  callingFrom={`${currentAccount?.username || extensionNum} (${currentAccount?.server || 'sip.example.com'})`}
+                  onOpenSettings={() => handleOpenSettings('sip')}
                   contacts={contacts}
+                  dids={authSession?.user?.dids || []}
+                  selectedDidId={selectedDidId}
+                  onSelectDid={setSelectedDidId}
                   lastCalledNumber={
                     callHistory.length > 0
                       ? callHistory[0].remote_uri.replace(/^sip:/i, '').split('@')[0]
@@ -493,6 +690,30 @@ export const App: React.FC = () => {
                 />
               )}
 
+              {activeTab === 'voicemail' && (
+                <VoicemailView
+                  onCall={handleMakeCall}
+                  voicemailBoxes={user.voicemail_boxes || []}
+                />
+              )}
+
+              {activeTab === 'messaging' && (
+                <MessagingView
+                  dids={user.dids || []}
+                  selectedDidId={selectedDidId}
+                  onSelectDid={setSelectedDidId}
+                  onCall={handleMakeCall}
+                />
+              )}
+
+              {activeTab === 'fax' && (
+                <FaxView
+                  faxBoxes={user.fax_boxes || []}
+                  dids={user.dids || []}
+                  selectedDidId={selectedDidId}
+                />
+              )}
+
               {activeTab === 'contacts' && (
                 <Contacts
                   contacts={contacts}
@@ -504,18 +725,16 @@ export const App: React.FC = () => {
             </div>
           )}
         </main>
-
-        {/* RingCentral & Dialpad Mini Mode Bottom Navigation Bar */}
-        <BottomNav
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          onOpenAudioModal={() => {
-            window.pjsip?.getAudioDevices();
-            setIsAudioModalOpen(true);
-          }}
-          isRegistered={isRegistered}
-        />
       </div>
+
+      {/* Bottom Navigation Bar for mobile */}
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onOpenSettings={() => handleOpenSettings('audio')}
+        isRegistered={isRegistered}
+        features={user.features}
+      />
 
       {/* Incoming Call Alert Modal */}
       {incomingCall && (
@@ -569,14 +788,14 @@ export const App: React.FC = () => {
               <button
                 onClick={() => setLogs([])}
                 title="Clear Logs"
-                className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
+                className="p-1 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setIsLogDrawerOpen(false)}
                 title="Close Drawer"
-                className="p-1 text-slate-400 hover:text-slate-200 transition-colors"
+                className="p-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -601,37 +820,36 @@ export const App: React.FC = () => {
       <ProfileMenu
         isOpen={isProfileMenuOpen}
         onClose={() => setIsProfileMenuOpen(false)}
-        displayName="Hirak Patel"
-        username={currentAccount?.username || 'hirakpatel'}
-        server={currentAccount?.server || 'sip.linphone.org'}
+        displayName={displayName}
+        username={currentAccount?.username || extensionNum}
+        server={currentAccount?.server || 'sip.example.com'}
         isRegistered={isRegistered}
         registrationStatus={registrationStatus}
         presence={presence}
         onChangePresence={setPresence}
-        onViewProfile={() => setIsAccountModalOpen(true)}
-        onSignOut={handleUnregister}
+        onViewProfile={() => handleOpenSettings('account')}
+        onSignOut={handleSignOut}
+        authUser={authSession.user}
       />
 
-      {/* SIP Account Settings Modal */}
-      <SipAccountModal
-        isOpen={isAccountModalOpen}
-        onClose={() => setIsAccountModalOpen(false)}
-        onSaveAndRegister={handleSaveAndRegister}
-        onUnregister={handleUnregister}
-        isRegistered={isRegistered}
-        registrationStatus={registrationStatus}
-        initialConfig={currentAccount || undefined}
-      />
-
-      {/* Audio Device Selection Modal */}
-      <AudioDeviceModal
-        isOpen={isAudioModalOpen}
-        onClose={() => setIsAudioModalOpen(false)}
+      {/* Unified Revamped Preferences & Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        defaultTab={settingsDefaultTab}
         devices={audioDevices}
         currentCaptureDev={currentCaptureDev}
         currentPlaybackDev={currentPlaybackDev}
         onSelectDevices={handleSelectAudioDevices}
         onRefreshDevices={handleRefreshDevices}
+        theme={theme}
+        onSetTheme={handleSetTheme}
+        currentAccount={currentAccount}
+        isRegistered={isRegistered}
+        registrationStatus={registrationStatus}
+        onSaveAndRegister={handleSaveAndRegister}
+        onUnregister={handleUnregister}
+        authUser={authSession.user}
       />
     </div>
   );

@@ -8,11 +8,11 @@ const pjsipService = PjsipService.getInstance();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 860,
-    height: 720,
+    width: 1200,
+    height: 800,
     minWidth: 440,
     minHeight: 600,
-    title: 'Unified Softphone',
+    title: 'TCX Connect',
     backgroundColor: '#0B0F19',
     titleBarStyle: 'hiddenInset',
     vibrancy: 'under-window',
@@ -25,6 +25,9 @@ function createWindow() {
     },
   });
 
+  // Start with maximized mode
+  mainWindow.maximize();
+
   const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
   if (isDev) {
@@ -32,6 +35,13 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    if (pjsipService.getIsReady() && mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('pjsip:event', { event: 'ready', version: '2.17', webrtc_aec: true });
+      mainWindow.webContents.send('pjsip:daemon_status', { isRunning: true });
+    }
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -87,8 +97,8 @@ function setupIpcHandlers() {
     return pjsipService.unregister();
   });
 
-  ipcMain.handle('pjsip:make_call', (_, destination: string) => {
-    return pjsipService.makeCall(destination);
+  ipcMain.handle('pjsip:make_call', (_, destination: string, extraHeaders?: Record<string, string>) => {
+    return pjsipService.makeCall(destination, extraHeaders);
   });
 
   ipcMain.handle('pjsip:answer', (_, callId: number) => {
@@ -117,6 +127,21 @@ function setupIpcHandlers() {
 
   ipcMain.handle('pjsip:set_audio_device', (_, { captureDev, playbackDev }: { captureDev: number; playbackDev: number }) => {
     return pjsipService.setAudioDevice(captureDev, playbackDev);
+  });
+
+  ipcMain.handle('window:toggle_maximize', () => {
+    if (!mainWindow) return false;
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+      return false;
+    } else {
+      mainWindow.maximize();
+      return true;
+    }
+  });
+
+  ipcMain.handle('window:is_maximized', () => {
+    return mainWindow ? mainWindow.isMaximized() : false;
   });
 }
 

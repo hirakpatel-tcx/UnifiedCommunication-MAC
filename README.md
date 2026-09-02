@@ -21,14 +21,14 @@ This softphone explicitly avoids Node Native Addons (`node-gyp` / `N-API`) to el
 ┌────────────────────────────▼─────────────────────────────┐
 │                 Electron Main Process                    │
 │  - main.ts: App lifecycle, IPC handlers, macOS window    │
-│  - pjsip-service.ts: Spawns and manages pjsip-daemon     │
+│  - pjsip-service.ts: Spawns and manages tcx-connect-daemon│
 │    * Stdout line-reader for JSON events                  │
 │    * Stdin stream writer for JSON commands               │
 │    * Crash recovery & exponential backoff restart        │
 └────────────────────────────┬─────────────────────────────┘
                              │ Standard I/O (JSON lines)
 ┌────────────────────────────▼─────────────────────────────┐
-│              pjsip-daemon (C++17 Standalone)             │
+│          tcx-connect-daemon (C++17 Standalone)           │
 │  - PJSIP v2.17 / PJSUA2 Engine with WebRTC AEC           │
 │  - Native Audio (CoreAudio / ALSA / OpenSL)              │
 │  - Thread-safe JSON command reader and event emitter     │
@@ -46,7 +46,7 @@ This softphone explicitly avoids Node Native Addons (`node-gyp` / `N-API`) to el
 ├── scripts/
 │   ├── setup-pjsip-2.17.sh          # Downloads, configures & compiles PJSIP 2.17
 │   └── symlink-libs.sh              # Normalizes library filenames across platforms
-├── pjsip-daemon/
+├── tcx-connect-daemon/
 │   ├── Makefile                     # Clang (macOS) / GCC (Linux) build
 │   ├── CMakeLists.txt               # Cross-platform CMake configuration
 │   ├── include/
@@ -57,11 +57,11 @@ This softphone explicitly avoids Node Native Addons (`node-gyp` / `N-API`) to el
     ├── package.json
     ├── vite.config.ts
     ├── tailwind.config.js
-    ├── electron-builder.json        # Bundles pjsip-daemon in extraResources
+    ├── electron-builder.json        # Bundles tcx-connect-daemon in extraResources
     ├── electron/
     │   ├── main.ts                  # Electron main process
     │   ├── preload.ts               # Secure contextBridge API
-    │   └── pjsip-service.ts         # Child process manager for pjsip-daemon
+    │   └── pjsip-service.ts         # Child process manager for tcx-connect-daemon
     └── src/
         ├── App.tsx
         ├── index.css
@@ -89,14 +89,14 @@ Download and compile PJSIP 2.17 statically with WebRTC AEC:
 ./scripts/setup-pjsip-2.17.sh
 ```
 
-### 3. Build PJSIP Daemon
+### 3. Build TCX Connect Daemon
 Compile the standalone C++ daemon:
 ```bash
-make -C pjsip-daemon
+make -C tcx-connect-daemon
 ```
 Test daemon standalone:
 ```bash
-printf '{"command":"get_audio_devices"}\n{"command":"shutdown"}\n' | ./pjsip-daemon/bin/pjsip-daemon
+printf '{"command":"get_audio_devices"}\n{"command":"shutdown"}\n' | ./tcx-connect-daemon/bin/tcx-connect-daemon
 ```
 
 ### 4. Run the Softphone Application
@@ -110,7 +110,7 @@ npm run dev
 
 ## 📡 JSON Protocol Specification
 
-The `pjsip-daemon` reads JSON objects separated by newlines (`\n`) from `stdin` and writes JSON event objects separated by newlines to `stdout`.
+The `tcx-connect-daemon` reads JSON objects separated by newlines (`\n`) from `stdin` and writes JSON event objects separated by newlines to `stdout`.
 
 ### Commands (`stdin`)
 - **Register**: `{"command":"register","params":{"server":"sip.domain.com","username":"1001","password":"***","port":5060,"transport":"udp"}}`

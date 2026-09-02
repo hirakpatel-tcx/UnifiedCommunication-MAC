@@ -52,14 +52,16 @@ pjproject-*/
 *.tar.gz
 *.tar.bz2
 
-# PJSIP Daemon binaries and build directories
+# PJSIP / TCX Connect Daemon binaries and build directories
 pjsip-daemon/bin/
 pjsip-daemon/build/
 pjsip-daemon/src/*.o
-pjsip-daemon/CMakeCache.txt
-pjsip-daemon/CMakeFiles/
-pjsip-daemon/cmake_install.cmake
-pjsip-daemon/Makefile.in
+tcx-connect-daemon/bin/
+tcx-connect-daemon/build/
+tcx-connect-daemon/src/*.o
+tcx-connect-daemon/CMakeCache.txt
+tcx-connect-daemon/CMakeFiles/
+tcx-connect-daemon/cmake_install.cmake
 
 # Logs
 *.log

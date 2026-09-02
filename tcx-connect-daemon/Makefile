@@ -7,7 +7,7 @@ BIN_DIR := bin
 SRC_DIR := src
 INC_DIR := include
 
-TARGET := $(BIN_DIR)/pjsip-daemon
+TARGET := $(BIN_DIR)/tcx-connect-daemon
 
 INCLUDES := -I$(INC_DIR) \
             -I$(PJSIP_DIR)/pjlib/include \
@@ -34,10 +34,15 @@ LIBS := -lpjsua2 -lpjsua -lpjsip-ua -lpjsip-simple -lpjsip \
         -lpjnath -lpjlib-util -lpj
 
 ifeq ($(UNAME_S),Darwin)
+    OPENSSL_DIR ?= /opt/homebrew/opt/openssl@3
+    ifneq ($(wildcard $(OPENSSL_DIR)),)
+        INCLUDES += -I$(OPENSSL_DIR)/include
+        LIB_DIRS += -L$(OPENSSL_DIR)/lib
+    endif
     FRAMEWORKS := -framework CoreAudio -framework AudioToolbox -framework AudioUnit \
                   -framework AVFoundation -framework CoreFoundation -framework CoreServices \
                   -framework Security -framework SystemConfiguration -framework Foundation -framework AppKit
-    SYSTEM_LIBS := -lpthread -lm $(FRAMEWORKS)
+    SYSTEM_LIBS := -lpthread -lm -lssl -lcrypto $(FRAMEWORKS)
 else
     SYSTEM_LIBS := -lpthread -lm -lasound -lssl -lcrypto
 endif

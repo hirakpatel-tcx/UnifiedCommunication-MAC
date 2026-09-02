@@ -123,7 +123,7 @@ public:
 
             // Endpoint configuration
             EpConfig ep_cfg;
-            ep_cfg.uaConfig.userAgent = "UnifiedCommunication-Softphone/1.0 (PJSIP 2.17)";
+            ep_cfg.uaConfig.userAgent = "TCX-Connect/1.0 (PJSIP 2.17)";
             ep_cfg.uaConfig.maxCalls = 32;
 
             // Media configuration - WebRTC Acoustic Echo Cancellation
@@ -140,7 +140,7 @@ public:
 
             ep_->libInit(ep_cfg);
 
-            // Transport configurations: UDP & TCP
+            // Transport configurations: UDP, TCP & TLS
             TransportConfig udp_cfg;
             udp_cfg.port = 0;
             ep_->transportCreate(PJSIP_TRANSPORT_UDP, udp_cfg);
@@ -148,6 +148,17 @@ public:
             TransportConfig tcp_cfg;
             tcp_cfg.port = 0;
             ep_->transportCreate(PJSIP_TRANSPORT_TCP, tcp_cfg);
+
+            try {
+                TransportConfig tls_cfg;
+                tls_cfg.port = 0;
+                tls_cfg.tlsConfig.verifyServer = false;
+                tls_cfg.tlsConfig.verifyClient = false;
+                ep_->transportCreate(PJSIP_TRANSPORT_TLS, tls_cfg);
+                std::cerr << "[DAEMON] TLS transport initialized successfully" << std::endl;
+            } catch (Error &err) {
+                std::cerr << "[DAEMON] Warning: TLS transport init failed: " << err.info() << std::endl;
+            }
 
             // Start library
             ep_->libStart();
@@ -249,6 +260,10 @@ public:
             acc_cfg.natConfig.iceEnabled = false;
             acc_cfg.natConfig.turnEnabled = false;
 
+            // Secure Media (SRTP)
+            acc_cfg.mediaConfig.srtpUse = PJMEDIA_SRTP_OPTIONAL;
+            acc_cfg.mediaConfig.srtpSecureSignaling = 0;
+
             if (acc_) {
                 acc_.reset();
             }
@@ -295,7 +310,7 @@ public:
         }
     }
 
-    void makeCall(const std::string& destination) {
+    void makeCall(const std::string& destination, const std::map<std::string, std::string>& extra_headers = {}) {
         if (!acc_) {
             logError("Cannot make call: No account configured");
             return;
@@ -314,6 +329,8 @@ public:
                     }
                     if (configured_transport_ == "tcp") {
                         ss << ";transport=tcp";
+                    } else if (configured_transport_ == "tls") {
+                        ss << ";transport=tls";
                     }
                     dest_uri = ss.str();
                 } else {
@@ -327,6 +344,17 @@ public:
             CallOpParam prm(true);
             prm.opt.audioCount = 1;
             prm.opt.videoCount = 0;
+
+            // Attach extra SIP headers (e.g., X-OverrideCID)
+            for (const auto& kv : extra_headers) {
+                if (!kv.first.empty() && !kv.second.empty()) {
+                    SipHeader hdr;
+                    hdr.hName = kv.first;
+                    hdr.hValue = kv.second;
+                    prm.txOption.headers.push_back(hdr);
+                    std::cerr << "[DAEMON] Added SIP header: " << kv.first << ": " << kv.second << std::endl;
+                }
+            }
 
             call->makeCall(dest_uri, prm);
             int call_id = call->getId();
@@ -728,7 +756,22 @@ int main(int argc, char* argv[]) {
                 app.unregisterAccount();
             } else if (command == "make_call") {
                 std::string dest = params.value("destination", "");
-                app.makeCall(dest);
+                std::map<std::string, std::string> extra_headers;
+                if (params.contains("extra_headers") && params["extra_headers"].is_object()) {
+                    for (auto& [key, val] : params["extra_headers"].items()) {
+                        if (val.is_string()) {
+                            extra_headers[key] = val.get<std::string>();
+                        }
+                    }
+                }
+                if (params.contains("extraHeader") && params["extraHeader"].is_object()) {
+                    for (auto& [key, val] : params["extraHeader"].items()) {
+                        if (val.is_string()) {
+                            extra_headers[key] = val.get<std::string>();
+                        }
+                    }
+                }
+                app.makeCall(dest, extra_headers);
             } else if (command == "answer") {
                 int call_id = params.value("call_id", -1);
                 app.answerCall(call_id);
