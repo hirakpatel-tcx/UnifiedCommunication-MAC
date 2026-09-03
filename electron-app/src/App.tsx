@@ -5,6 +5,7 @@ import { BottomNav } from './components/BottomNav';
 import { ProfileMenu, PresenceStatus } from './components/ProfileMenu';
 import { Dialpad } from './components/Dialpad';
 import { ActiveCall } from './components/ActiveCall';
+import { CallBar } from './components/CallBar';
 import { CallHistory } from './components/CallHistory';
 import { Contacts } from './components/Contacts';
 import { SettingsModal, SettingsTab } from './components/SettingsModal';
@@ -142,10 +143,35 @@ export const App: React.FC = () => {
     }
   });
 
-  // Call State
-  const [activeCall, setActiveCall] = useState<CallStateEvent | null>(null);
+  // Call State — supports multiple concurrent calls ("lines").
+  // `calls` holds every in-progress/just-ended call keyed by call_id; `focusedCallId`
+  // decides which one is shown front-and-center in the various call UIs.
+  const [calls, setCalls] = useState<CallStateEvent[]>([]);
+  const [focusedCallId, setFocusedCallId] = useState<number | null>(null);
   const [incomingCall, setIncomingCall] = useState<CallStateEvent | null>(null);
-  const callStartTimeRef = useRef<number>(0);
+  const [callMuteState, setCallMuteState] = useState<Record<number, boolean>>({});
+  const [callHoldState, setCallHoldState] = useState<Record<number, boolean>>({});
+  const [isCallExpanded, setIsCallExpanded] = useState(true);
+  const [isLargeScreen, setIsLargeScreen] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
+  // Per-call start times (for duration/history), keyed by call_id — replaces the old
+  // single callStartTimeRef now that multiple calls can be in progress simultaneously.
+  const callStartTimesRef = useRef<Record<number, number>>({});
+
+  // The call to show "right now" — the explicitly focused one, or the most recently
+  // added call as a fallback, for backward-compatible single-call prop passing.
+  const focusedCall: CallStateEvent | null =
+    (focusedCallId != null ? calls.find((c) => c.call_id === focusedCallId) : undefined) ??
+    (calls.length > 0 ? calls[calls.length - 1] : null);
+
+  const isCallMuted = focusedCall ? !!callMuteState[focusedCall.call_id] : false;
+  const isCallOnHold = focusedCall ? !!callHoldState[focusedCall.call_id] : false;
+
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const handleChange = () => setIsLargeScreen(mql.matches);
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, []);
 
   // Call History State
   const [callHistory, setCallHistory] = useState<CallRecord[]>(() => {
@@ -229,53 +255,89 @@ export const App: React.FC = () => {
     const cleanupCallState = window.pjsip.onCallState((state) => {
       console.log('[APP] Call state event:', state);
       if (state.state === 'INCOMING') {
+        // Incoming calls still go through the existing accept/decline banner flow
+        // first (see `incomingCall`); they only join `calls` once answered (CONFIRMED).
         setIncomingCall(state);
         startRinger();
       } else if (state.state === 'CONFIRMED') {
         stopRinger();
-        callStartTimeRef.current = Date.now();
         setIncomingCall(null);
-        setActiveCall(state);
+
+        setCalls((prev) => {
+          const existingIdx = prev.findIndex((c) => c.call_id === state.call_id);
+          const isNewCall = existingIdx === -1;
+          if (isNewCall) {
+            callStartTimesRef.current[state.call_id] = Date.now();
+            // Auto-focus a genuinely new call, matching the previous auto-expand
+            // behavior — but never steal focus for an update to an existing call.
+            setFocusedCallId(state.call_id);
+            return [...prev, state];
+          }
+          // Upsert: update the existing call in place, don't overwrite other lines.
+          const next = [...prev];
+          next[existingIdx] = state;
+          return next;
+        });
       } else if (state.state === 'DISCONNECTED') {
         stopRinger();
         setIncomingCall(null);
 
-        // Record into Call History
-        const durationSecs = callStartTimeRef.current > 0
-          ? Math.max(0, Math.floor((Date.now() - callStartTimeRef.current) / 1000))
-          : 0;
+        setCalls((prev) => {
+          const endedCall = prev.find((c) => c.call_id === state.call_id);
+          const startTime = callStartTimesRef.current[state.call_id] || 0;
 
-        if (activeCall) {
-          const newRecord: CallRecord = {
-            id: Date.now().toString(),
-            remote_uri: activeCall.remote_uri,
-            direction: 'outbound',
-            status: durationSecs > 0 ? 'connected' : 'declined',
-            duration: durationSecs,
-            timestamp: Date.now(),
-          };
-          setCallHistory((prev) => [newRecord, ...prev.slice(0, 49)]);
-        }
+          // Record into Call History
+          const durationSecs = startTime > 0
+            ? Math.max(0, Math.floor((Date.now() - startTime) / 1000))
+            : 0;
 
-        callStartTimeRef.current = 0;
+          if (endedCall) {
+            const newRecord: CallRecord = {
+              id: Date.now().toString(),
+              remote_uri: endedCall.remote_uri,
+              direction: 'outbound',
+              status: durationSecs > 0 ? 'connected' : 'declined',
+              duration: durationSecs,
+              timestamp: Date.now(),
+            };
+            setCallHistory((prevHistory) => [newRecord, ...prevHistory.slice(0, 49)]);
+          }
 
-        setActiveCall({
-          event: 'call_state',
-          call_id: state.call_id,
-          state: 'DISCONNECTED',
-          remote_uri: state.remote_uri || 'Call',
-          last_status: state.last_status,
-          reason: state.reason || (state.last_status ? `Ended (${state.last_status})` : 'Call Ended'),
+          delete callStartTimesRef.current[state.call_id];
+
+          // Remove this specific call from the active set; leave other in-progress
+          // calls untouched.
+          const remaining = prev.filter((c) => c.call_id !== state.call_id);
+
+          // If the disconnected call was focused, auto-focus another remaining call.
+          setFocusedCallId((curFocus) =>
+            curFocus === state.call_id ? (remaining.length > 0 ? remaining[remaining.length - 1].call_id : null) : curFocus
+          );
+
+          setCallMuteState((prevMute) => {
+            const { [state.call_id]: _removed, ...rest } = prevMute;
+            return rest;
+          });
+          setCallHoldState((prevHold) => {
+            const { [state.call_id]: _removed, ...rest } = prevHold;
+            return rest;
+          });
+
+          return remaining;
         });
-
-        // Auto-dismiss after 2 seconds
-        setTimeout(() => {
-          setActiveCall((curr) => (curr?.state === 'DISCONNECTED' ? null : curr));
-        }, 2000);
       } else {
+        // Other transient states (CALLING/EARLY/CONNECTING/NULL) — upsert same as CONFIRMED.
         stopRinger();
         setIncomingCall(null);
-        setActiveCall(state);
+        setCalls((prev) => {
+          const existingIdx = prev.findIndex((c) => c.call_id === state.call_id);
+          if (existingIdx === -1) {
+            return [...prev, state];
+          }
+          const next = [...prev];
+          next[existingIdx] = state;
+          return next;
+        });
       }
     });
 
@@ -364,7 +426,20 @@ export const App: React.FC = () => {
       cleanupEvent();
       stopRinger();
     };
-  }, [activeCall]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-expand the call screen whenever a new call starts
+  const prevCallIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (focusedCall && focusedCall.call_id !== prevCallIdRef.current) {
+      setIsCallExpanded(true);
+      if (isLargeScreen) {
+        setActiveTab('keypad');
+      }
+    }
+    prevCallIdRef.current = focusedCall?.call_id ?? null;
+  }, [focusedCall, isLargeScreen]);
 
   // Handle Login Success
   const handleLoginSuccess = (loginResponse: LoginResponse, password?: string) => {
@@ -403,7 +478,7 @@ export const App: React.FC = () => {
     const token = authSession?.refreshToken;
     const url = authSession?.baseUrl;
     if (token) {
-      logoutUser(token, url).catch(() => {});
+      logoutUser(token, url).catch(() => { });
     }
 
     clearAuthSession();
@@ -414,7 +489,10 @@ export const App: React.FC = () => {
     setSelectedDidId(null);
     setIsProfileMenuOpen(false);
     setIsSettingsOpen(false);
-    setActiveCall(null);
+    setCalls([]);
+    setFocusedCallId(null);
+    setCallMuteState({});
+    setCallHoldState({});
     setIncomingCall(null);
   };
 
@@ -439,14 +517,20 @@ export const App: React.FC = () => {
       }
 
       window.pjsip.makeCall(destination, extraHeaders);
-      callStartTimeRef.current = 0;
-      // Optimistic active call state
-      setActiveCall({
-        event: 'call_state',
-        call_id: 0,
-        state: 'CALLING',
-        remote_uri: destination,
-      });
+      // Optimistic active call state using a placeholder call_id (0) until the real
+      // CONFIRMED/CALLING event arrives with the actual call_id. Since only one
+      // outbound dial can be "pending" at a time before its real id lands, this
+      // placeholder is safe to upsert by call_id === 0.
+      setCalls((prev) => [
+        ...prev.filter((c) => c.call_id !== 0),
+        {
+          event: 'call_state',
+          call_id: 0,
+          state: 'CALLING',
+          remote_uri: destination,
+        },
+      ]);
+      setFocusedCallId(0);
     },
     [authSession, selectedDidId]
   );
@@ -455,12 +539,13 @@ export const App: React.FC = () => {
     stopRinger();
     if (!window.pjsip) return;
     window.pjsip.answerCall(callId);
-    callStartTimeRef.current = Date.now();
     if (incomingCall) {
-      setActiveCall({
-        ...incomingCall,
-        state: 'CONFIRMED',
-      });
+      callStartTimesRef.current[incomingCall.call_id] = Date.now();
+      setCalls((prev) => [
+        ...prev.filter((c) => c.call_id !== incomingCall.call_id),
+        { ...incomingCall, state: 'CONFIRMED' },
+      ]);
+      setFocusedCallId(incomingCall.call_id);
       setIncomingCall(null);
     }
   };
@@ -488,15 +573,35 @@ export const App: React.FC = () => {
     if (window.pjsip) {
       window.pjsip.hangupCall(callId);
     }
-    setActiveCall(null);
+    // Optimistically drop the call locally; the real DISCONNECTED event (handled in
+    // the onCallState listener) will also remove it and record call history — this
+    // just makes the UI feel immediate. Removing a non-focused call leaves the rest
+    // of `calls` and the current focus untouched.
+    setCalls((prev) => prev.filter((c) => c.call_id !== callId));
+    setCallMuteState((prev) => {
+      const { [callId]: _removed, ...rest } = prev;
+      return rest;
+    });
+    setCallHoldState((prev) => {
+      const { [callId]: _removed, ...rest } = prev;
+      return rest;
+    });
+    setFocusedCallId((curFocus) => {
+      if (curFocus !== callId) return curFocus;
+      const remaining = calls.filter((c) => c.call_id !== callId);
+      return remaining.length > 0 ? remaining[remaining.length - 1].call_id : null;
+    });
+    setIsCallExpanded(true);
   };
 
   const handleMute = (callId: number, mute: boolean) => {
     window.pjsip?.muteCall(callId, mute);
+    setCallMuteState((prev) => ({ ...prev, [callId]: mute }));
   };
 
   const handleHold = (callId: number, hold: boolean) => {
     window.pjsip?.holdCall(callId, hold);
+    setCallHoldState((prev) => ({ ...prev, [callId]: hold }));
   };
 
   const handleSendDtmf = (callId: number, digits: string) => {
@@ -538,11 +643,21 @@ export const App: React.FC = () => {
     setContacts((prev) => prev.filter((c) => c.id !== id));
   };
 
+  const handleUpdateContact = (id: string, updates: Omit<Contact, 'id'>) => {
+    setContacts((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+  };
+
   const handleClearHistory = () => {
     setCallHistory([]);
   };
 
   const handleTabChange = (tab: NavTab) => {
+    // On compact windows, the full-screen ActiveCall view blocks the rest of the
+    // app — navigating to a different tab should auto-minimize it to the CallBar
+    // so the destination page is actually visible underneath.
+    if (!isLargeScreen && tab !== activeTab && focusedCall) {
+      setIsCallExpanded(false);
+    }
     setActiveTab(tab);
   };
 
@@ -558,7 +673,11 @@ export const App: React.FC = () => {
   }
 
   const user = authSession.user;
-  const displayName = user.email.split('@')[0];
+  console.log(user)
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim();
+  const displayName = fullName || user.email.split('@')[0];
+  console.log(fullName)
+  console.log(displayName);
   const extensionNum = user.extension?.extension_number || currentAccount?.username || 'hirakpatel';
 
   return (
@@ -589,8 +708,8 @@ export const App: React.FC = () => {
             onClick={() => setIsLogDrawerOpen(!isLogDrawerOpen)}
             title="Live SIP Log Console"
             className={`md:hidden p-1.5 rounded-xl transition-colors cursor-pointer ${isLogDrawerOpen
-                ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
+              ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
           >
             <Terminal className="w-4 h-4" />
@@ -604,10 +723,74 @@ export const App: React.FC = () => {
           >
             <Settings className="w-4 h-4" />
             <span
-              className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ${
-                isRegistered ? 'bg-emerald-500' : 'bg-amber-400'
-              }`}
+              className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ${isRegistered ? 'bg-emerald-500' : 'bg-amber-400'
+                }`}
             />
+          </button>
+
+          {/* DEMO ONLY: preview the multi-line UI without a real backend.
+              1st click adds a demo call (line 1); 2nd click (while line 1 is still up)
+              adds a 2nd demo call with a different call_id/remote_uri so the
+              line-switcher tabs are visible for QA; 3rd click clears all demo calls. */}
+          <button
+            onClick={() => {
+              const demoCallIds = [999, 998];
+              const demoCallsPresent = calls.filter((c) => demoCallIds.includes(c.call_id));
+              if (demoCallsPresent.length >= 2) {
+                // Clear all demo calls
+                setCalls((prev) => prev.filter((c) => !demoCallIds.includes(c.call_id)));
+                setCallMuteState((prev) => {
+                  const next = { ...prev };
+                  demoCallIds.forEach((id) => delete next[id]);
+                  return next;
+                });
+                setCallHoldState((prev) => {
+                  const next = { ...prev };
+                  demoCallIds.forEach((id) => delete next[id]);
+                  return next;
+                });
+                setFocusedCallId((cur) => (demoCallIds.includes(cur ?? -1) ? null : cur));
+              } else if (demoCallsPresent.length === 1) {
+                // Add a second demo line
+                const newDemoCall: CallStateEvent = {
+                  event: 'call_state',
+                  call_id: 998,
+                  state: 'CONFIRMED',
+                  remote_uri: 'sip:demo.caller2@sip.example.com',
+                };
+                setCalls((prev) => [...prev, newDemoCall]);
+                setFocusedCallId(998);
+              } else {
+                // Add the first demo line
+                const newDemoCall: CallStateEvent = {
+                  event: 'call_state',
+                  call_id: 999,
+                  state: 'CONFIRMED',
+                  remote_uri: 'sip:demo.caller@sip.example.com',
+                };
+                setCalls((prev) => [...prev, newDemoCall]);
+                setFocusedCallId(999);
+              }
+            }}
+            title={
+              calls.some((c) => [999, 998].includes(c.call_id))
+                ? 'Add / end demo calls'
+                : 'Start demo call'
+            }
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-colors cursor-pointer ${calls.some((c) => [999, 998].includes(c.call_id))
+              ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400'
+              : 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400'
+              }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${calls.some((c) => [999, 998].includes(c.call_id)) ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'
+                }`}
+            />
+            {calls.filter((c) => [999, 998].includes(c.call_id)).length >= 2
+              ? 'End Demo Calls'
+              : calls.some((c) => [999, 998].includes(c.call_id))
+              ? 'Add 2nd Demo Call'
+              : 'Demo Call'}
           </button>
 
           {/* User Profile Badge with Live Presence Indicator */}
@@ -621,14 +804,14 @@ export const App: React.FC = () => {
             </div>
             <span
               className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 ${isRegistered
-                  ? presence === 'available'
-                    ? 'bg-emerald-500 ring-1 ring-emerald-500/40'
-                    : presence === 'busy' || presence === 'dnd'
-                      ? 'bg-rose-500 ring-1 ring-rose-500/40'
-                      : 'bg-amber-400 ring-1 ring-amber-400/40'
-                  : registrationStatus.toLowerCase().includes('reg')
-                    ? 'bg-amber-400 animate-pulse'
-                    : 'bg-slate-400'
+                ? presence === 'available'
+                  ? 'bg-emerald-500 ring-1 ring-emerald-500/40'
+                  : presence === 'busy' || presence === 'dnd'
+                    ? 'bg-rose-500 ring-1 ring-rose-500/40'
+                    : 'bg-amber-400 ring-1 ring-amber-400/40'
+                : registrationStatus.toLowerCase().includes('reg')
+                  ? 'bg-amber-400 animate-pulse'
+                  : 'bg-slate-400'
                 }`}
             />
           </button>
@@ -649,24 +832,60 @@ export const App: React.FC = () => {
         />
 
         {/* Content Viewport */}
-        <main className="flex-1 flex flex-col p-2.5 sm:p-4 md:p-5 overflow-y-auto w-full">
-          {activeCall ? (
-            <div className="flex-1 flex items-center justify-center">
-              <ActiveCall
-                callId={activeCall.call_id}
-                remoteUri={activeCall.remote_uri}
-                state={activeCall.state}
-                reason={activeCall.reason}
-                lastStatus={activeCall.last_status}
-                onHangup={handleHangup}
-                onMute={handleMute}
-                onHold={handleHold}
-                onSendDtmf={handleSendDtmf}
-                onOpenAudioModal={() => handleOpenSettings('audio')}
-              />
-            </div>
+        <main className="flex-1 flex flex-col p-1.5 sm:p-2.5 md:p-3 overflow-y-auto w-full">
+          {focusedCall && isCallExpanded && !isLargeScreen ? (
+            <ActiveCall
+              callId={focusedCall.call_id}
+              remoteUri={focusedCall.remote_uri}
+              state={focusedCall.state}
+              reason={focusedCall.reason}
+              lastStatus={focusedCall.last_status}
+              onHangup={handleHangup}
+              onMute={handleMute}
+              onHold={handleHold}
+              onSendDtmf={handleSendDtmf}
+              audioDevices={audioDevices}
+              currentCaptureDev={currentCaptureDev}
+              currentPlaybackDev={currentPlaybackDev}
+              onSelectAudioDevices={handleSelectAudioDevices}
+              onCollapse={() => setIsCallExpanded(false)}
+              isMuted={isCallMuted}
+              isOnHold={isCallOnHold}
+              calls={calls.map((c) => ({
+                callId: c.call_id,
+                remoteUri: c.remote_uri,
+                state: c.state,
+                isOnHold: !!callHoldState[c.call_id],
+              }))}
+              onFocusCall={setFocusedCallId}
+            />
           ) : (
-            <div className="w-full h-full flex flex-col">
+            <div className="w-full h-full flex flex-col min-h-0">
+              {focusedCall && !(isLargeScreen && activeTab === 'keypad') && (
+                <CallBar
+                  callId={focusedCall.call_id}
+                  remoteUri={focusedCall.remote_uri}
+                  state={focusedCall.state}
+                  isMuted={isCallMuted}
+                  isOnHold={isCallOnHold}
+                  onExpand={() => setIsCallExpanded(true)}
+                  onHangup={() => handleHangup(focusedCall.call_id)}
+                  onMuteToggle={() => handleMute(focusedCall.call_id, !isCallMuted)}
+                  onHoldToggle={() => handleHold(focusedCall.call_id, !isCallOnHold)}
+                  onSendDtmf={(digit) => handleSendDtmf(focusedCall.call_id, digit)}
+                  audioDevices={audioDevices}
+                  currentCaptureDev={currentCaptureDev}
+                  currentPlaybackDev={currentPlaybackDev}
+                  onSelectAudioDevices={handleSelectAudioDevices}
+                  calls={calls.map((c) => ({
+                    callId: c.call_id,
+                    remoteUri: c.remote_uri,
+                    state: c.state,
+                    isOnHold: !!callHoldState[c.call_id],
+                  }))}
+                  onFocusCall={setFocusedCallId}
+                />
+              )}
               {activeTab === 'dashboard' && (
                 <DashboardView
                   user={user}
@@ -675,8 +894,6 @@ export const App: React.FC = () => {
                   registrationStatus={registrationStatus}
                   history={callHistory}
                   contacts={contacts}
-                  dids={user.dids || []}
-                  selectedDidId={selectedDidId}
                   onNavigateTab={handleTabChange}
                   onCall={handleMakeCall}
                   onOpenSettings={() => handleOpenSettings('audio')}
@@ -689,6 +906,8 @@ export const App: React.FC = () => {
                   callingFrom={`${currentAccount?.username || extensionNum} (${currentAccount?.server || 'sip.example.com'})`}
                   onOpenSettings={() => handleOpenSettings('sip')}
                   contacts={contacts}
+                  history={callHistory}
+                  features={user.features}
                   dids={authSession?.user?.dids || []}
                   selectedDidId={selectedDidId}
                   onSelectDid={setSelectedDidId}
@@ -697,6 +916,38 @@ export const App: React.FC = () => {
                       ? callHistory[0].remote_uri.replace(/^sip:/i, '').split('@')[0]
                       : undefined
                   }
+                  activeCall={
+                    focusedCall
+                      ? {
+                          callId: focusedCall.call_id,
+                          remoteUri: focusedCall.remote_uri,
+                          state: focusedCall.state,
+                          reason: focusedCall.reason,
+                          lastStatus: focusedCall.last_status,
+                          isMuted: isCallMuted,
+                          isOnHold: isCallOnHold,
+                        }
+                      : null
+                  }
+                  calls={calls.map((c) => ({
+                    callId: c.call_id,
+                    remoteUri: c.remote_uri,
+                    state: c.state,
+                    reason: c.reason,
+                    lastStatus: c.last_status,
+                    isMuted: !!callMuteState[c.call_id],
+                    isOnHold: !!callHoldState[c.call_id],
+                  }))}
+                  focusedCallId={focusedCallId}
+                  onFocusCall={setFocusedCallId}
+                  onHangup={handleHangup}
+                  onMute={handleMute}
+                  onHold={handleHold}
+                  onSendDtmf={handleSendDtmf}
+                  audioDevices={audioDevices}
+                  currentCaptureDev={currentCaptureDev}
+                  currentPlaybackDev={currentPlaybackDev}
+                  onSelectAudioDevices={handleSelectAudioDevices}
                 />
               )}
 
@@ -738,6 +989,8 @@ export const App: React.FC = () => {
                   onCall={handleMakeCall}
                   onAddContact={handleAddContact}
                   onDeleteContact={handleDeleteContact}
+                  onUpdateContact={handleUpdateContact}
+                  messagingEnabled={!!user.features?.messaging}
                 />
               )}
             </div>

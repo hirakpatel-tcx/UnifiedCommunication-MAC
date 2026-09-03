@@ -35,6 +35,13 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Enable touch-drag scrolling in mobile WebViews for all scroll containers */
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
@@ -114,11 +121,6 @@ body {
   100% { transform: scale(1); }
 }
 
-@keyframes equalizerWave {
-  0%, 100% { height: 6px; }
-  50% { height: 26px; }
-}
-
 @keyframes pulseGlow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
   50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
@@ -143,9 +145,4 @@ body {
 
 .tactile-btn:active {
   transform: scale(0.94);
-}
-
-/* Equalizer bar animation helper */
-.equalizer-bar {
-  animation: equalizerWave 1.2s ease-in-out infinite alternate;
 }

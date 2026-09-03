@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Voicemail,
   Play,
@@ -7,6 +7,8 @@ import {
   PhoneCall,
   Search,
   Volume2,
+  ChevronDown,
+  Check,
 } from 'lucide-react';
 
 interface VoicemailItem {
@@ -43,10 +45,32 @@ const SAMPLE_VOICEMAILS: VoicemailItem[] = [
   },
 ];
 
-export const VoicemailView: React.FC<VoicemailViewProps> = ({ onCall, voicemailBoxes = [] }) => {
+type ReadFilter = 'all' | 'unread' | 'read';
+
+const READ_FILTER_LABELS: Record<ReadFilter, string> = {
+  all: 'All',
+  unread: 'Unread',
+  read: 'Read',
+};
+
+export const VoicemailView: React.FC<VoicemailViewProps> = ({ onCall }) => {
   const [voicemails, setVoicemails] = useState<VoicemailItem[]>(SAMPLE_VOICEMAILS);
   const [searchQuery, setSearchQuery] = useState('');
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [readFilter, setReadFilter] = useState<ReadFilter>('all');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isFilterOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFilterOpen]);
 
   const formatDuration = (secs: number) => {
     const m = Math.floor(secs / 60);
@@ -72,6 +96,8 @@ export const VoicemailView: React.FC<VoicemailViewProps> = ({ onCall, voicemailB
   };
 
   const filtered = voicemails.filter((vm) => {
+    if (readFilter === 'unread' && vm.isRead) return false;
+    if (readFilter === 'read' && !vm.isRead) return false;
     const q = searchQuery.toLowerCase();
     return (
       vm.caller.toLowerCase().includes(q) ||
@@ -80,31 +106,65 @@ export const VoicemailView: React.FC<VoicemailViewProps> = ({ onCall, voicemailB
   });
 
   return (
-    <div className="flex flex-col h-full w-full max-w-2xl mx-auto p-4 md:p-6 overflow-hidden animate-fadeIn">
+    <div className="flex flex-col flex-1 w-full min-h-0 overflow-hidden animate-fadeIn rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs p-3 sm:p-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <Voicemail className="w-5 h-5 text-brand-600 dark:text-brand-400" />
             Voicemail Inbox
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {voicemailBoxes.length > 0
-              ? `Connected to ${voicemailBoxes.length} voicemail box(es)`
-              : 'Listen and manage audio messages'}
-          </p>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search voicemails..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-200 w-full sm:w-56"
-          />
+        <div className="flex items-center gap-2">
+          {/* Search */}
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search voicemails..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-200 w-full sm:w-56"
+            />
+          </div>
+
+          {/* Read / Unread Filter */}
+          <div className="relative shrink-0" ref={filterRef}>
+            <button
+              onClick={() => setIsFilterOpen((v) => !v)}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+                readFilter !== 'all'
+                  ? 'bg-brand-50 dark:bg-brand-950/40 border-brand-300 dark:border-brand-700 text-brand-700 dark:text-brand-300'
+                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {READ_FILTER_LABELS[readFilter]}
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+
+            {isFilterOpen && (
+              <div className="absolute top-full mt-1 right-0 z-30 w-32 rounded-xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-popIn p-1">
+                {(Object.keys(READ_FILTER_LABELS) as ReadFilter[]).map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => {
+                      setReadFilter(opt);
+                      setIsFilterOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-xs font-medium transition-colors cursor-pointer ${
+                      readFilter === opt
+                        ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    }`}
+                  >
+                    <span>{READ_FILTER_LABELS[opt]}</span>
+                    {readFilter === opt && <Check className="w-3.5 h-3.5" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

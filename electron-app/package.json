@@ -4,7 +4,7 @@
   "description": "Production-grade VoIP Desktop Softphone powered by Electron, React, and PJSIP 2.17",
   "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "concurrently -k -n \"VITE,ELEC\" -c \"blue,green\" \"vite\" \"wait-on tcp:5173 && npm run electron:dev\"",
+    "dev": "concurrently -k -n \"VITE,ELEC\" -c \"blue,green\" \"vite --host\" \"wait-on tcp:5173 && npm run electron:dev\"",
     "build": "tsc && vite build && tsc -p tsconfig.electron.json",
     "electron:dev": "tsc -p tsconfig.electron.json && electron .",
     "pack": "npm run build && electron-builder --dir",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "emoji-picker-react": "^4.19.4",
     "lucide-react": "^0.475.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

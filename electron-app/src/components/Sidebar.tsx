@@ -41,12 +41,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   features = { calling: true, fax: false, messaging: false },
 }) => {
   // Build navigation items based on user features
-  const navItems: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [];
+  const navItems: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string; fill?: string }> }[] = [];
 
   // Calling features: Dashboard, Keypad (Dialer), Recents, Voicemail
   if (features.calling !== false) {
     navItems.push({ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard });
-    navItems.push({ id: 'keypad', label: 'Dialer', icon: Phone });
+    navItems.push({ id: 'keypad', label: 'Phone', icon: Phone });
     navItems.push({ id: 'recents', label: 'Recents', icon: Clock });
     navItems.push({ id: 'voicemail', label: 'Voicemail', icon: Voicemail });
   }
@@ -78,17 +78,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title={item.label}
               className={`relative flex flex-col items-center justify-center w-12 h-11 rounded-xl transition-all duration-150 cursor-pointer shrink-0 ${
                 isActive
-                  ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
+                  ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/80'
               }`}
             >
-              <Icon className="w-4.5 h-4.5" />
+              <Icon className="w-4.5 h-4.5" fill="none" />
               <span className="text-[8px] font-medium mt-0.5 tracking-tight truncate max-w-full px-0.5 leading-none">
                 {item.label}
               </span>
-              {isActive && (
-                <span className="absolute -left-1.5 top-2.5 bottom-2.5 w-1 bg-brand-600 rounded-r-full" />
-              )}
             </button>
           );
         })}

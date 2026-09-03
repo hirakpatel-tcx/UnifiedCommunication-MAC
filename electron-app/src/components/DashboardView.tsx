@@ -13,7 +13,7 @@ import {
   PhoneForwarded,
   Sparkles,
 } from 'lucide-react';
-import { AuthUser, UserDID } from '../types/auth';
+import { AuthUser } from '../types/auth';
 import { CallRecord, Contact, SipAccountConfig } from '../types/pjsip';
 
 interface DashboardViewProps {
@@ -23,8 +23,6 @@ interface DashboardViewProps {
   registrationStatus: string;
   history: CallRecord[];
   contacts?: Contact[];
-  dids: UserDID[];
-  selectedDidId: string | null;
   onNavigateTab: (tab: any) => void;
   onCall: (destination: string) => void;
   onOpenSettings?: () => void;
@@ -36,14 +34,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   registrationStatus,
   history,
   contacts = [],
-  dids,
-  selectedDidId,
   onNavigateTab,
   onCall,
   onOpenSettings,
 }) => {
   const [directorySearch, setDirectorySearch] = useState<string>('');
-  const activeDid = dids.find((d) => d.id === selectedDidId) || dids[0];
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email.split('@')[0];
   const totalCalls = history.length;
   const missedCalls = history.filter((h) => h.status === 'missed').length;
   const connectedCalls = history.filter((h) => h.status === 'connected').length;
@@ -59,7 +55,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   });
 
   return (
-    <div className="flex flex-col h-full w-full mx-auto p-1 sm:p-2 md:p-3 overflow-y-auto space-y-3 sm:space-y-4 animate-fadeIn">
+    <div className="flex flex-col flex-1 w-full min-h-0 mx-auto space-y-3 sm:space-y-4 animate-fadeIn">
       {/* Top Welcome & Quick Actions Bar */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-brand-600 to-indigo-700 p-3.5 sm:p-4 md:p-5 text-white shadow-md shadow-indigo-600/15 shrink-0">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -84,10 +80,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
-              Welcome back, {user.email.split('@')[0]}
+              {user.is_first_login ? 'Welcome' : 'Welcome back'}, {fullName}
             </h1>
             <p className="text-indigo-100/85 text-[11px] sm:text-xs">
-              Tenant: <span className="font-semibold text-white">{user.tenant?.tenant_name || user.tenant?.tenant_code}</span> | Caller ID: <span className="font-mono font-semibold text-white">{activeDid?.number || 'Default'}</span>
+              Tenant: <span className="font-semibold text-white">{user.tenant?.tenant_name || user.tenant?.tenant_code}</span>
             </p>
           </div>
 

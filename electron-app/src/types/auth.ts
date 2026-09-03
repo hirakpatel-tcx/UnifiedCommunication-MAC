@@ -36,8 +36,11 @@ export interface UserDID {
 export interface AuthUser {
   id: string;
   email: string;
+  first_name?: string;
+  last_name?: string;
   role: string;
   is_active: boolean;
+  is_first_login?: boolean;
   tenant: Tenant;
   sip_domain?: string;
   effective_sip_domain?: string;

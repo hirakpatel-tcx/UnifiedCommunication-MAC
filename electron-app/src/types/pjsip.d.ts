@@ -17,10 +17,18 @@ export interface CallRecord {
   timestamp: number; // Unix ms
 }
 
+export interface ContactNumber {
+  label: string;
+  number: string;
+}
+
 export interface Contact {
   id: string;
   name: string;
   number: string;
+  firstName?: string;
+  lastName?: string;
+  numbers?: ContactNumber[];
   company?: string;
   email?: string;
 }
