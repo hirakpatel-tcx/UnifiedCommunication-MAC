@@ -115,11 +115,11 @@ export const FaxView: React.FC<FaxViewProps> = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full min-h-0 select-none animate-fadeIn rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs p-3 sm:p-4">
+    <div className="flex flex-col flex-1 w-full min-h-0 select-none animate-fadeIn rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs p-3 sm:p-4">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-800">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             <Printer className="w-5 h-5 text-brand-600 dark:text-brand-400" />
             Fax
           </h2>
@@ -138,16 +138,16 @@ export const FaxView: React.FC<FaxViewProps> = () => {
       {/* Fax List */}
       <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
         {faxes.length === 0 ? (
-          <div className="h-full min-h-[260px] flex flex-col items-center justify-center text-center text-slate-400 text-xs">
-            <Printer className="w-10 h-10 mb-2 text-slate-300 dark:text-slate-700 stroke-[1.5]" />
-            <p className="font-semibold text-slate-600 dark:text-slate-300">No faxes found</p>
-            <p className="text-slate-400 text-[11px]">Sent and received faxes will appear here</p>
+          <div className="h-full min-h-[260px] flex flex-col items-center justify-center text-center text-zinc-400 text-xs">
+            <Printer className="w-10 h-10 mb-2 text-zinc-300 dark:text-zinc-700 stroke-[1.5]" />
+            <p className="font-semibold text-zinc-600 dark:text-zinc-300">No faxes found</p>
+            <p className="text-zinc-400 text-[11px]">Sent and received faxes will appear here</p>
           </div>
         ) : (
           faxes.map((fax) => (
             <div
               key={fax.id}
-              className="group flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 hover:border-brand-500/40 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all shadow-xs"
+              className="group flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-brand-500/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all shadow-xs"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div
@@ -161,14 +161,14 @@ export const FaxView: React.FC<FaxViewProps> = () => {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
+                    <span className="font-mono font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 truncate">
                       {fax.recipientOrSender}
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full uppercase font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full uppercase font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 shrink-0">
                       {fax.direction}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
                     {fax.fileName} • {fax.pages} page(s) •{' '}
                     {new Date(fax.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                   </p>
@@ -192,20 +192,20 @@ export const FaxView: React.FC<FaxViewProps> = () => {
                 <div className="flex items-center gap-1.5">
                   <button
                     title={`View ${fax.fileName}`}
-                    className="p-2 rounded-xl text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-colors cursor-pointer"
                   >
                     <Eye className="w-4 h-4" />
                   </button>
                   <button
                     title={`Download ${fax.fileName}`}
-                    className="p-2 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(fax.id)}
                     title="Delete fax"
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -224,16 +224,16 @@ export const FaxView: React.FC<FaxViewProps> = () => {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md max-h-[85vh] flex flex-col rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl animate-popIn overflow-hidden"
+            className="w-full max-w-md max-h-[85vh] flex flex-col rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-popIn overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 shrink-0">
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                 <Send className="w-4 h-4 text-brand-600 dark:text-brand-400" />
                 Send Fax
               </h3>
               <button
                 onClick={resetSendForm}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -241,7 +241,7 @@ export const FaxView: React.FC<FaxViewProps> = () => {
 
             <form onSubmit={handleSendFax} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
                   Destination Fax Number
                 </label>
                 <input
@@ -250,20 +250,20 @@ export const FaxView: React.FC<FaxViewProps> = () => {
                   placeholder="e.g. +1 (800) 555-0199"
                   value={destinationNumber}
                   onChange={(e) => setDestinationNumber(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3.5 py-2 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
                   Document Attachment (PDF, TIFF, Word)
                 </label>
-                <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl hover:border-brand-500 transition-colors cursor-pointer bg-slate-50/50 dark:bg-slate-800/40">
-                  <UploadCloud className="w-7 h-7 text-slate-400 mb-2" />
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 text-center">
+                <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-2xl hover:border-brand-500 transition-colors cursor-pointer bg-zinc-50/50 dark:bg-zinc-800/40">
+                  <UploadCloud className="w-7 h-7 text-zinc-400 mb-2" />
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 text-center">
                     {selectedFile ? selectedFile.name : 'Click to select or drag PDF file here'}
                   </span>
-                  <span className="text-[10px] text-slate-400 mt-0.5">Max size: 25MB</span>
+                  <span className="text-[10px] text-zinc-400 mt-0.5">Max size: 25MB</span>
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx,.tiff,.tif"
@@ -274,7 +274,7 @@ export const FaxView: React.FC<FaxViewProps> = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
                   Cover Page Note (Optional)
                 </label>
                 <textarea
@@ -282,7 +282,7 @@ export const FaxView: React.FC<FaxViewProps> = () => {
                   placeholder="Notes or instructions to print on the cover sheet..."
                   value={coverPageText}
                   onChange={(e) => setCoverPageText(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
@@ -290,7 +290,7 @@ export const FaxView: React.FC<FaxViewProps> = () => {
                 <button
                   type="button"
                   onClick={resetSendForm}
-                  className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -130,12 +130,12 @@ export const CallControls: React.FC<CallControlsProps> = ({
           className={`flex items-center justify-center ${btnSize} rounded-full tactile-btn transition-colors ${
             active
               ? ACTIVE_COLOR_CLASSES[activeColor]
-              : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 border border-slate-200 dark:border-slate-700/60'
+              : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700/60'
           }`}
         >
           {icon}
         </span>
-        <span className={`${labelSize} font-medium text-slate-500 dark:text-slate-400`}>{label}</span>
+        <span className={`${labelSize} font-medium text-zinc-500 dark:text-zinc-400`}>{label}</span>
       </button>
     ) : (
       <button
@@ -144,7 +144,7 @@ export const CallControls: React.FC<CallControlsProps> = ({
         className={`flex flex-col items-center justify-center ${btnSize} rounded-2xl tactile-btn cursor-pointer ${
           active
             ? ACTIVE_COLOR_CLASSES[activeColor]
-            : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/60'
+            : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700/60'
         }`}
       >
         {icon}
@@ -153,13 +153,13 @@ export const CallControls: React.FC<CallControlsProps> = ({
     );
 
   const audioPopover = (
-    <div className="absolute bottom-full mb-2 right-0 z-40 w-64 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-popIn p-3">
-      <p className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+    <div className="absolute bottom-full mb-2 right-0 z-40 w-64 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden animate-popIn p-3">
+      <p className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">
         <Mic className="w-3 h-3" /> Microphone
       </p>
       <div className="space-y-1 mb-3">
         {audioDevices.filter((d) => d.input_count > 0).length === 0 ? (
-          <p className="text-[11px] text-slate-400 px-1">No input devices found</p>
+          <p className="text-[11px] text-zinc-400 px-1">No input devices found</p>
         ) : (
           audioDevices
             .filter((d) => d.input_count > 0)
@@ -171,7 +171,7 @@ export const CallControls: React.FC<CallControlsProps> = ({
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                   currentCaptureDev === d.id
                     ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                 }`}
               >
                 <span className="truncate">{d.name}</span>
@@ -181,12 +181,12 @@ export const CallControls: React.FC<CallControlsProps> = ({
         )}
       </div>
 
-      <p className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+      <p className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">
         <Headphones className="w-3 h-3" /> Speaker
       </p>
       <div className="space-y-1">
         {audioDevices.filter((d) => d.output_count > 0).length === 0 ? (
-          <p className="text-[11px] text-slate-400 px-1">No output devices found</p>
+          <p className="text-[11px] text-zinc-400 px-1">No output devices found</p>
         ) : (
           audioDevices
             .filter((d) => d.output_count > 0)
@@ -198,7 +198,7 @@ export const CallControls: React.FC<CallControlsProps> = ({
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                   currentPlaybackDev === d.id
                     ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                 }`}
               >
                 <span className="truncate">{d.name}</span>
@@ -211,15 +211,15 @@ export const CallControls: React.FC<CallControlsProps> = ({
   );
 
   const transferPopover = (
-    <div className="absolute bottom-full mb-2 right-0 z-40 w-64 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-popIn p-3">
-      <div className="flex items-center bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg text-xs mb-2.5">
+    <div className="absolute bottom-full mb-2 right-0 z-40 w-64 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden animate-popIn p-3">
+      <div className="flex items-center bg-zinc-100 dark:bg-zinc-800/60 p-0.5 rounded-lg text-xs mb-2.5">
         <button
           type="button"
           onClick={() => setTransferMode('blind')}
           className={`flex-1 px-2 py-1.5 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
             transferMode === 'blind'
-              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
-              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-2xs'
+              : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
           }`}
         >
           Blind
@@ -229,8 +229,8 @@ export const CallControls: React.FC<CallControlsProps> = ({
           onClick={() => setTransferMode('attended')}
           className={`flex-1 px-2 py-1.5 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
             transferMode === 'attended'
-              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
-              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-2xs'
+              : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
           }`}
         >
           Attended
@@ -245,7 +245,7 @@ export const CallControls: React.FC<CallControlsProps> = ({
           placeholder="Transfer to number..."
           value={transferNumber}
           onChange={(e) => setTransferNumber(e.target.value)}
-          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
+          className="w-full px-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
         />
         <button
           type="submit"
@@ -331,16 +331,16 @@ export const CallControls: React.FC<CallControlsProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xs rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl animate-popIn overflow-hidden"
+            className="w-full max-w-xs rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-popIn overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                 <Grid className="w-4 h-4 text-brand-600 dark:text-brand-400" />
                 Keypad
               </h3>
               <button
                 onClick={onToggleKeypad}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -351,7 +351,7 @@ export const CallControls: React.FC<CallControlsProps> = ({
                   <button
                     key={d}
                     onClick={() => handleDtmfPress(d)}
-                    className="h-11 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-800 dark:text-slate-100 font-semibold active:scale-92 tactile-btn text-base border border-slate-200 dark:border-slate-700/50 shadow-xs cursor-pointer"
+                    className="h-11 rounded-xl bg-zinc-50 dark:bg-zinc-800 hover:bg-brand-600 hover:text-white text-zinc-800 dark:text-zinc-100 font-semibold active:scale-92 tactile-btn text-base border border-zinc-200 dark:border-zinc-700/50 shadow-xs cursor-pointer"
                   >
                     {d}
                   </button>
@@ -370,16 +370,16 @@ export const CallControls: React.FC<CallControlsProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xs rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl animate-popIn overflow-hidden"
+            className="w-full max-w-xs rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-popIn overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                 <UserPlus className="w-4 h-4 text-brand-600 dark:text-brand-400" />
                 Add to Call
               </h3>
               <button
                 onClick={() => setIsAddCallOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -392,7 +392,7 @@ export const CallControls: React.FC<CallControlsProps> = ({
                 placeholder="Number to add..."
                 value={addCallNumber}
                 onChange={(e) => setAddCallNumber(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
+                className="w-full px-3 py-2 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
               />
               <button
                 type="submit"

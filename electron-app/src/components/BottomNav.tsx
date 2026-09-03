@@ -101,15 +101,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       {isMoreOpen && (
         <div
           ref={moreMenuRef}
-          className="absolute bottom-16 right-2 left-2 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl backdrop-blur-xl animate-fadeIn z-40"
+          className="absolute bottom-16 right-2 left-2 p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl backdrop-blur-xl animate-fadeIn z-40"
         >
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100 dark:border-zinc-800">
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               More Options
             </span>
             <button
               onClick={() => setIsMoreOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
             >
               <X className="w-4 h-4" />
             </button>
@@ -129,7 +129,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   className={`flex items-center gap-3 p-3 rounded-xl transition-colors cursor-pointer text-left ${
                     isActive
                       ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
-                      : 'bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   <Icon className="w-5 h-5 shrink-0" />
@@ -142,7 +142,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       )}
 
       {/* Main 5-button Bottom Nav Bar */}
-      <nav className="flex items-center justify-around h-14 px-2 border-t border-slate-200 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg select-none transition-colors">
+      <nav className="flex items-center justify-around h-14 px-2 border-t border-zinc-200 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg select-none transition-colors">
         {primaryItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -156,7 +156,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               className={`relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-all duration-150 cursor-pointer ${
                 isActive
                   ? 'text-brand-600 dark:text-brand-400 scale-105'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {isActive && (
@@ -177,7 +177,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             className={`relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-all duration-150 cursor-pointer ${
               isOverflowActive || isMoreOpen
                 ? 'text-brand-600 dark:text-brand-400 scale-105'
-                : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
             }`}
           >
             {(isOverflowActive || isMoreOpen) && (

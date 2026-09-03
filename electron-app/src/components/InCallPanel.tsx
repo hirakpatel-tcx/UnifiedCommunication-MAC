@@ -91,32 +91,32 @@ export const InCallPanel: React.FC<InCallPanelProps> = ({
       : 'bg-indigo-500';
 
   return (
-    <div className="hidden lg:flex flex-1 flex-col rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs min-h-0 overflow-hidden">
+    <div className="hidden lg:flex flex-1 flex-col rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs min-h-0 overflow-hidden">
       {onFocusCall && calls.length > 1 && (
-        <div className="shrink-0 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="shrink-0 px-6 pt-5 pb-4 border-b border-zinc-100 dark:border-zinc-800">
           <LineSwitcher calls={calls} focusedCallId={callId} onSelect={onFocusCall} />
         </div>
       )}
 
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
         <div className="relative flex items-center justify-center w-24 h-24 mb-4">
-          <div className="relative z-10 flex items-center justify-center w-[70px] h-[70px] rounded-full bg-gradient-to-tr from-brand-600 to-indigo-500 text-white text-xl font-bold shadow-xl shadow-brand-500/30">
+          <div className="relative z-10 flex items-center justify-center w-[70px] h-[70px] rounded-full bg-brand-600 text-white text-xl font-bold shadow-xl shadow-brand-500/30">
             {parseCaller(remoteUri).slice(0, 2).toUpperCase()}
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
           {parseCaller(remoteUri)}
         </h2>
 
-        <div className="mt-3.5 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/60 shadow-xs">
+        <div className="mt-3.5 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700/60 shadow-xs">
           <span className={`w-2 h-2 rounded-full ${statusDotClass}`} />
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{statusLabel}</span>
+          <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{statusLabel}</span>
         </div>
       </div>
 
       {/* Circular Call Control Grid */}
-      <div className="shrink-0 px-6 py-5 bg-white dark:bg-slate-900">
+      <div className="shrink-0 px-6 py-5 bg-white dark:bg-zinc-900">
         <CallControls
           callId={callId}
           isMuted={isMuted}

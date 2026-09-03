@@ -184,17 +184,17 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
   });
 
   return (
-    <div className="flex flex-1 w-full min-h-0 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden animate-fadeIn">
+    <div className="flex flex-1 w-full min-h-0 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs overflow-hidden animate-fadeIn">
       {/* Sidebar: Conversation List */}
       <div
-        className={`w-full sm:w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 flex-col bg-slate-50/50 dark:bg-slate-900/50 ${
+        className={`w-full sm:w-80 shrink-0 border-r border-zinc-200 dark:border-zinc-800 flex-col bg-zinc-50/50 dark:bg-zinc-900/50 ${
           showThreadOnMobile ? 'hidden sm:flex' : 'flex'
         }`}
       >
         {/* Outbound DID Selector & Title */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 space-y-3">
+        <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-brand-600 dark:text-brand-400" />
               Messages
             </h2>
@@ -203,13 +203,13 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
           {/* Outbound DID Dropdown */}
           {messagingDids.length > 0 && (
             <div>
-              <label className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 block mb-1">
+              <label className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 block mb-1">
                 Sending From (DID)
               </label>
               <select
                 value={selectedDidId || messagingDids[0]?.id}
                 onChange={(e) => onSelectDid(e.target.value)}
-                className="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-brand-500"
               >
                 {messagingDids.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -222,19 +222,19 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
 
           {/* Search Box */}
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" />
             <input
               type="text"
               placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none text-slate-800 dark:text-slate-200"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:outline-none text-zinc-800 dark:text-zinc-200"
             />
           </div>
         </div>
 
         {/* Conversation Items */}
-        <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+        <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800/60">
           {filteredConversations.map((conv) => {
             const isSelected = conv.id === activeConv?.id;
             return (
@@ -251,26 +251,26 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
                 className={`w-full text-left p-3.5 flex items-start gap-3 transition-colors cursor-pointer ${
                   isSelected
                     ? 'bg-brand-50 dark:bg-brand-950/30 border-l-4 border-brand-600'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                    : 'hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
                 }`}
               >
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                <div className="w-10 h-10 rounded-2xl bg-brand-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                   {conv.contactName.slice(0, 2).toUpperCase()}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
+                    <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
                       {conv.contactName}
                     </h4>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-zinc-400">
                       {new Date(conv.lastTimestamp).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
                     {conv.lastMessage}
                   </p>
                 </div>
@@ -288,30 +288,30 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
 
       {/* Main Chat Thread */}
       <div
-        className={`flex-1 flex-col h-full bg-white dark:bg-slate-900 min-w-0 ${
+        className={`flex-1 flex-col h-full bg-white dark:bg-zinc-900 min-w-0 ${
           showThreadOnMobile ? 'flex' : 'hidden sm:flex'
         }`}
       >
         {activeConv ? (
           <>
             {/* Conversation Header */}
-            <div className="px-3 sm:px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+            <div className="px-3 sm:px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <button
                   onClick={() => setShowThreadOnMobile(false)}
                   title="Back to conversations"
-                  className="sm:hidden p-2 -ml-1 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                  className="sm:hidden p-2 -ml-1 rounded-xl text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
-                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 font-semibold text-xs shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 font-semibold text-xs shrink-0">
                   <User className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
+                  <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">
                     {activeConv.contactName}
                   </h3>
-                  <p className="text-xs font-mono text-slate-500 truncate">{activeConv.phoneNumber}</p>
+                  <p className="text-xs font-mono text-zinc-500 truncate">{activeConv.phoneNumber}</p>
                 </div>
               </div>
 
@@ -319,7 +319,7 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
                 <button
                   onClick={() => onCall(activeConv.phoneNumber)}
                   title="Call this number"
-                  className="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-zinc-500 hover:text-brand-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <Phone className="w-4 h-4" />
                 </button>
@@ -339,13 +339,13 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
                       className={`max-w-xs md:max-w-md px-4 py-2.5 rounded-2xl text-sm ${
                         isMe
                           ? 'bg-brand-600 text-white rounded-br-xs shadow-md shadow-brand-600/10'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-xs'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-xs'
                       }`}
                     >
                       {m.attachmentName && (
                         <div
                           className={`flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-xl mb-1.5 ${
-                            isMe ? 'bg-white/15' : 'bg-white dark:bg-slate-700'
+                            isMe ? 'bg-white/15' : 'bg-white dark:bg-zinc-700'
                           }`}
                         >
                           <FileText className="w-3.5 h-3.5 shrink-0" />
@@ -354,7 +354,7 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
                       )}
                       {m.text && <p className="leading-relaxed whitespace-pre-wrap">{m.text}</p>}
                     </div>
-                    <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400">
+                    <div className="flex items-center gap-1 mt-1 text-[10px] text-zinc-400">
                       <span>
                         {new Date(m.timestamp).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -369,17 +369,17 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
             </div>
 
             {/* Message Input Box */}
-            <div className="border-t border-slate-200 dark:border-slate-800">
+            <div className="border-t border-zinc-200 dark:border-zinc-800">
               {pendingAttachment && (
                 <div className="flex items-center gap-2 px-3 pt-2.5">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs text-slate-700 dark:text-slate-200 max-w-full">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 max-w-full">
                     <FileText className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 shrink-0" />
                     <span className="truncate">{pendingAttachment.name}</span>
                     <button
                       type="button"
                       onClick={() => setPendingAttachment(null)}
                       title="Remove attachment"
-                      className="p-0.5 rounded-md text-slate-400 hover:text-rose-500 transition-colors cursor-pointer shrink-0"
+                      className="p-0.5 rounded-md text-zinc-400 hover:text-rose-500 transition-colors cursor-pointer shrink-0"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -403,7 +403,7 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
                     className={`p-2.5 rounded-2xl transition-colors cursor-pointer ${
                       isEmojiPickerOpen
                         ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                     }`}
                   >
                     <Smile className="w-4 h-4" />
@@ -436,14 +436,14 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
                   }}
                   placeholder="Type your message..."
                   rows={1}
-                  className="flex-1 min-w-0 min-h-[42px] px-4 py-2.5 text-sm rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none max-h-[120px] overflow-y-auto leading-normal"
+                  className="flex-1 min-w-0 min-h-[42px] px-4 py-2.5 text-sm rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none max-h-[120px] overflow-y-auto leading-normal"
                 />
 
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   title="Attach a file"
-                  className="p-2.5 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                  className="p-2.5 rounded-2xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
@@ -459,7 +459,7 @@ export const MessagingView: React.FC<MessagingViewProps> = ({
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+          <div className="flex-1 flex items-center justify-center text-zinc-400 text-sm">
             Select a conversation to start messaging
           </div>
         )}

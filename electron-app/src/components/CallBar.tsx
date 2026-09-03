@@ -152,13 +152,13 @@ export const CallBar: React.FC<CallBarProps> = ({
 
   const iconBtnClass = (active: boolean, activeClass: string) =>
     `p-2 rounded-xl transition-colors cursor-pointer ${
-      active ? activeClass : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+      active ? activeClass : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
     }`;
 
   return (
     <div
       ref={barRef}
-      className="relative shrink-0 mb-1.5 sm:mb-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-visible"
+      className="relative shrink-0 mb-1.5 sm:mb-2 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs overflow-visible"
     >
       <div className="w-full flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 flex-wrap sm:flex-nowrap">
         <button
@@ -175,10 +175,10 @@ export const CallBar: React.FC<CallBarProps> = ({
             }`}
           />
           <span className="min-w-0 max-w-[9rem] sm:max-w-[12rem]">
-            <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+            <span className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
               {parseCaller(remoteUri)}
             </span>
-            <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-mono">{statusLabel}</span>
+            <span className="block text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">{statusLabel}</span>
           </span>
         </button>
 
@@ -191,7 +191,7 @@ export const CallBar: React.FC<CallBarProps> = ({
               className={`flex items-center gap-1 px-2 py-1.5 rounded-xl text-[11px] font-semibold border transition-colors cursor-pointer ${
                 openPopover === 'lines'
                   ? 'bg-brand-50 dark:bg-brand-950/40 border-brand-300 dark:border-brand-700 text-brand-700 dark:text-brand-300'
-                  : 'bg-slate-100 dark:bg-slate-800/80 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  : 'bg-zinc-100 dark:bg-zinc-800/80 border-transparent text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
               }`}
             >
               {calls.length} lines
@@ -199,7 +199,7 @@ export const CallBar: React.FC<CallBarProps> = ({
             </button>
 
             {openPopover === 'lines' && (
-              <FixedPopover anchorRef={linesBtnRef} align="left" className="w-56 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden p-1.5">
+              <FixedPopover anchorRef={linesBtnRef} align="left" className="w-56 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden p-1.5">
                 {calls.map((call, idx) => {
                   const isFocused = call.callId === callId;
                   return (
@@ -212,7 +212,7 @@ export const CallBar: React.FC<CallBarProps> = ({
                       className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                         isFocused
                           ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                          : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${lineStatusDotClass(call)}`} />
@@ -247,15 +247,15 @@ export const CallBar: React.FC<CallBarProps> = ({
             </button>
 
             {openPopover === 'transfer' && (
-              <FixedPopover anchorRef={transferBtnRef} align="right" className="w-64 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden p-3">
-                <div className="flex items-center bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg text-xs mb-2.5">
+              <FixedPopover anchorRef={transferBtnRef} align="right" className="w-64 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden p-3">
+                <div className="flex items-center bg-zinc-100 dark:bg-zinc-800/60 p-0.5 rounded-lg text-xs mb-2.5">
                   <button
                     type="button"
                     onClick={() => setTransferMode('blind')}
                     className={`flex-1 px-2 py-1.5 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
                       transferMode === 'blind'
-                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
-                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-2xs'
+                        : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                     }`}
                   >
                     Blind
@@ -265,8 +265,8 @@ export const CallBar: React.FC<CallBarProps> = ({
                     onClick={() => setTransferMode('attended')}
                     className={`flex-1 px-2 py-1.5 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
                       transferMode === 'attended'
-                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
-                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-2xs'
+                        : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                     }`}
                   >
                     Attended
@@ -281,7 +281,7 @@ export const CallBar: React.FC<CallBarProps> = ({
                     placeholder="Transfer to number..."
                     value={transferNumber}
                     onChange={(e) => setTransferNumber(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
                   />
                   <button
                     type="submit"
@@ -306,13 +306,13 @@ export const CallBar: React.FC<CallBarProps> = ({
             </button>
 
             {openPopover === 'keypad' && (
-              <FixedPopover anchorRef={keypadBtnRef} align="right" className="w-56 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden p-3">
+              <FixedPopover anchorRef={keypadBtnRef} align="right" className="w-56 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden p-3">
                 <div className="grid grid-cols-3 gap-1.5">
                   {DTMF_DIGITS.map((d) => (
                     <button
                       key={d}
                       onClick={() => handleDtmfPress(d)}
-                      className="h-9 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-800 dark:text-slate-100 font-semibold active:scale-92 tactile-btn text-sm cursor-pointer"
+                      className="h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-brand-600 hover:text-white text-zinc-800 dark:text-zinc-100 font-semibold active:scale-92 tactile-btn text-sm cursor-pointer"
                     >
                       {d}
                     </button>
@@ -333,13 +333,13 @@ export const CallBar: React.FC<CallBarProps> = ({
             </button>
 
             {openPopover === 'addCall' && (
-              <FixedPopover anchorRef={addCallBtnRef} align="right" className="w-64 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden p-3">
+              <FixedPopover anchorRef={addCallBtnRef} align="right" className="w-64 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Add to Call</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">Add to Call</p>
                   <button
                     type="button"
                     onClick={() => setOpenPopover(null)}
-                    className="p-0.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                    className="p-0.5 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -352,7 +352,7 @@ export const CallBar: React.FC<CallBarProps> = ({
                     placeholder="Number to add..."
                     value={addCallNumber}
                     onChange={(e) => setAddCallNumber(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
                   />
                   <button
                     type="submit"
@@ -377,13 +377,13 @@ export const CallBar: React.FC<CallBarProps> = ({
             </button>
 
             {openPopover === 'audio' && (
-              <FixedPopover anchorRef={audioBtnRef} align="right" className="w-64 rounded-2xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden p-3">
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              <FixedPopover anchorRef={audioBtnRef} align="right" className="w-64 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden p-3">
+                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">
                   <Mic className="w-3 h-3" /> Microphone
                 </p>
                 <div className="space-y-1 mb-3">
                   {audioDevices.filter((d) => d.input_count > 0).length === 0 ? (
-                    <p className="text-[11px] text-slate-400 px-1">No input devices found</p>
+                    <p className="text-[11px] text-zinc-400 px-1">No input devices found</p>
                   ) : (
                     audioDevices
                       .filter((d) => d.input_count > 0)
@@ -395,7 +395,7 @@ export const CallBar: React.FC<CallBarProps> = ({
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                             currentCaptureDev === d.id
                               ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                              : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                              : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                           }`}
                         >
                           <span className="truncate">{d.name}</span>
@@ -405,12 +405,12 @@ export const CallBar: React.FC<CallBarProps> = ({
                   )}
                 </div>
 
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">
                   <Headphones className="w-3 h-3" /> Speaker
                 </p>
                 <div className="space-y-1">
                   {audioDevices.filter((d) => d.output_count > 0).length === 0 ? (
-                    <p className="text-[11px] text-slate-400 px-1">No output devices found</p>
+                    <p className="text-[11px] text-zinc-400 px-1">No output devices found</p>
                   ) : (
                     audioDevices
                       .filter((d) => d.output_count > 0)
@@ -422,7 +422,7 @@ export const CallBar: React.FC<CallBarProps> = ({
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                             currentPlaybackDev === d.id
                               ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                              : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                              : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                           }`}
                         >
                           <span className="truncate">{d.name}</span>

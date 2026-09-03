@@ -37,21 +37,21 @@ export const AudioDeviceModal: React.FC<AudioDeviceModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="glass-panel w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div className="glass-panel w-full max-w-md rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-indigo-500/10 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
               <Volume2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Audio Devices</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Microphone & speaker routing with WebRTC AEC</p>
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Audio Devices</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Microphone & speaker routing with WebRTC AEC</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -72,15 +72,15 @@ export const AudioDeviceModal: React.FC<AudioDeviceModalProps> = ({
           {/* Input Device (Microphone) */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <Mic className="w-3.5 h-3.5 text-slate-400" />
+              <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                <Mic className="w-3.5 h-3.5 text-zinc-400" />
                 Microphone (Input)
               </label>
               <button
                 type="button"
                 onClick={onRefreshDevices}
                 title="Refresh device list"
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
@@ -89,13 +89,13 @@ export const AudioDeviceModal: React.FC<AudioDeviceModalProps> = ({
             <select
               value={selectedCapture}
               onChange={(e) => setSelectedCapture(Number(e.target.value))}
-              className="glass-input w-full px-3 py-2 rounded-xl text-xs text-slate-800 dark:text-slate-200 outline-none"
+              className="glass-input w-full px-3 py-2 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none"
             >
-              <option value={-1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+              <option value={-1} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                 Default Microphone (System)
               </option>
               {captureDevices.map((d) => (
-                <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                <option key={d.id} value={d.id} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                   {d.name} ({d.driver})
                 </option>
               ))}
@@ -105,8 +105,8 @@ export const AudioDeviceModal: React.FC<AudioDeviceModalProps> = ({
           {/* Output Device (Speaker) */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <Volume2 className="w-3.5 h-3.5 text-slate-400" />
+              <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                <Volume2 className="w-3.5 h-3.5 text-zinc-400" />
                 Speakers / Headphones (Output)
               </label>
               <button
@@ -122,13 +122,13 @@ export const AudioDeviceModal: React.FC<AudioDeviceModalProps> = ({
             <select
               value={selectedPlayback}
               onChange={(e) => setSelectedPlayback(Number(e.target.value))}
-              className="glass-input w-full px-3 py-2 rounded-xl text-xs text-slate-800 dark:text-slate-200 outline-none"
+              className="glass-input w-full px-3 py-2 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none"
             >
-              <option value={-2} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+              <option value={-2} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                 Default Speakers (System)
               </option>
               {playbackDevices.map((d) => (
-                <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                <option key={d.id} value={d.id} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                   {d.name} ({d.driver})
                 </option>
               ))}
@@ -137,18 +137,18 @@ export const AudioDeviceModal: React.FC<AudioDeviceModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-6 mt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-6 mt-4 border-t border-zinc-200 dark:border-zinc-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition-colors"
+            className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleApply}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 text-white font-semibold text-xs shadow-lg shadow-brand-600/30 transition-all cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-lg shadow-brand-600/30 transition-all cursor-pointer"
           >
             Apply Changes
           </button>

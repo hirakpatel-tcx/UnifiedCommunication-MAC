@@ -3,28 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #F8FAFC;
+  --color-bg: #FAFAFA;
   --color-surface-base: #FFFFFF;
-  --color-surface-hover: #F1F5F9;
-  --color-surface-input: #F8FAFC;
-  --color-border: #E2E8F0;
-  --color-border-subtle: #F1F5F9;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94A3B8;
+  --color-surface-hover: #F4F4F5;
+  --color-surface-input: #FAFAFA;
+  --color-border: #E4E4E7;
+  --color-border-subtle: #F4F4F5;
+  --color-text-primary: #18181B;
+  --color-text-secondary: #52525B;
+  --color-text-muted: #A1A1AA;
   color-scheme: light;
 }
 
 .dark {
-  --color-bg: #0B0F19;
-  --color-surface-base: #131B2E;
-  --color-surface-hover: #1A243D;
-  --color-surface-input: #0B0F19;
+  --color-bg: #09090B;
+  --color-surface-base: #18181B;
+  --color-surface-hover: #27272A;
+  --color-surface-input: #09090B;
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-subtle: rgba(255, 255, 255, 0.04);
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
+  --color-text-primary: #FAFAFA;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #71717A;
   color-scheme: dark;
 }
 

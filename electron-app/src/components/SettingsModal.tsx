@@ -149,18 +149,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="glass-panel w-full max-w-2xl h-[92vh] sm:h-[560px] max-h-[640px] rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col overflow-hidden text-slate-800 dark:text-slate-100">
+      <div className="glass-panel w-full max-w-2xl h-[92vh] sm:h-[560px] max-h-[640px] rounded-2xl sm:rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col overflow-hidden text-zinc-800 dark:text-zinc-100">
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div className="p-1.5 sm:p-2 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 shrink-0">
               <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 leading-tight truncate">
+              <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 leading-tight truncate">
                 Preferences & Settings
               </h2>
-              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate hidden sm:block">
+              <p className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate hidden sm:block">
                 Manage audio routing, themes, and PBX credentials
               </p>
             </div>
@@ -168,7 +168,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer shrink-0 ml-2"
+            className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors cursor-pointer shrink-0 ml-2"
           >
             <X className="w-5 h-5" />
           </button>
@@ -177,7 +177,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Main Content Body (Responsive horizontal tabs on small screens, vertical sidebar rail on sm+) */}
         <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
           {/* Navigation Bar / Rail */}
-          <div className="flex sm:flex-col flex-row overflow-x-auto sm:overflow-x-visible w-full sm:w-44 shrink-0 p-1.5 sm:p-3 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 gap-1 scrollbar-none">
+          <div className="flex sm:flex-col flex-row overflow-x-auto sm:overflow-x-visible w-full sm:w-44 shrink-0 p-1.5 sm:p-3 border-b sm:border-b-0 sm:border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/40 gap-1 scrollbar-none">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -188,7 +188,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`flex items-center gap-2 px-3 py-2 sm:py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left whitespace-nowrap shrink-0 sm:shrink ${
                     isActive
                       ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -222,7 +222,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Input Device (Microphone) */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                       <Mic className="w-4 h-4 text-brand-500" />
                       Microphone (Input Device)
                     </label>
@@ -230,7 +230,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       type="button"
                       onClick={onRefreshDevices}
                       title="Refresh device list"
-                      className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                      className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
                     >
                       <RefreshCw className="w-3 h-3" />
                       <span>Refresh</span>
@@ -244,13 +244,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       setSelectedCapture(val);
                       onSelectDevices(val, selectedPlayback);
                     }}
-                    className="glass-input w-full px-3 py-2.5 rounded-xl text-xs text-slate-800 dark:text-slate-200 outline-none"
+                    className="glass-input w-full px-3 py-2.5 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none"
                   >
-                    <option value={-1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                    <option value={-1} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                       Default Microphone (System Audio)
                     </option>
                     {captureDevices.map((d) => (
-                      <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                      <option key={d.id} value={d.id} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                         {d.name} ({d.driver})
                       </option>
                     ))}
@@ -260,7 +260,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Output Device (Speakers) */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                       <Volume2 className="w-4 h-4 text-brand-500" />
                       Speakers / Headphones (Output Device)
                     </label>
@@ -281,13 +281,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       setSelectedPlayback(val);
                       onSelectDevices(selectedCapture, val);
                     }}
-                    className="glass-input w-full px-3 py-2.5 rounded-xl text-xs text-slate-800 dark:text-slate-200 outline-none"
+                    className="glass-input w-full px-3 py-2.5 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none"
                   >
-                    <option value={-2} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                    <option value={-2} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                       Default Speakers (System Audio)
                     </option>
                     {playbackDevices.map((d) => (
-                      <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                      <option key={d.id} value={d.id} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                         {d.name} ({d.driver})
                       </option>
                     ))}
@@ -298,7 +298,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={handleApplyAudio}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer text-center"
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition-colors cursor-pointer text-center"
                   >
                     Save Audio Preferences
                   </button>
@@ -310,8 +310,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'appearance' && (
               <div className="space-y-4 sm:space-y-6 animate-fadeIn">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">Theme Selection</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">Theme Selection</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Choose how the softphone interface looks on your desktop
                   </p>
                 </div>
@@ -323,18 +323,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className={`p-3.5 sm:p-4 rounded-2xl border flex flex-row sm:flex-col items-center sm:text-center gap-3 transition-all cursor-pointer ${
                       theme === 'light'
                         ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-950/20 ring-2 ring-brand-500/20 shadow-md'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                     }`}
                   >
                     <div className="p-2.5 sm:p-3 rounded-full bg-amber-100 text-amber-600 shrink-0">
                       <Sun className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div className="text-left sm:text-center min-w-0">
-                      <div className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 sm:justify-center">
+                      <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 sm:justify-center">
                         <span>Light Mode</span>
                         {theme === 'light' && <Check className="w-4 h-4 text-brand-600 shrink-0" />}
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Crisp, high-contrast light surfaces</p>
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Crisp, high-contrast light surfaces</p>
                     </div>
                   </button>
 
@@ -344,24 +344,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className={`p-3.5 sm:p-4 rounded-2xl border flex flex-row sm:flex-col items-center sm:text-center gap-3 transition-all cursor-pointer ${
                       theme === 'dark'
                         ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-950/20 ring-2 ring-brand-500/20 shadow-md'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                        : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                     }`}
                   >
-                    <div className="p-2.5 sm:p-3 rounded-full bg-slate-900 text-indigo-400 shrink-0">
+                    <div className="p-2.5 sm:p-3 rounded-full bg-zinc-900 text-indigo-400 shrink-0">
                       <Moon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div className="text-left sm:text-center min-w-0">
-                      <div className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 sm:justify-center">
+                      <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 sm:justify-center">
                         <span>Dark Mode</span>
                         {theme === 'dark' && <Check className="w-4 h-4 text-brand-600 shrink-0" />}
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Sleek dark macOS glassmorphic aesthetic</p>
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Sleek dark macOS glassmorphic aesthetic</p>
                     </div>
                   </button>
                 </div>
 
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-100/60 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                  <div className="flex items-center gap-2 font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
                     <Monitor className="w-4 h-4 text-brand-500 shrink-0" />
                     <span>macOS Vibrancy & Styling</span>
                   </div>
@@ -377,8 +377,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               return (
                 <div className="space-y-3.5 sm:space-y-4 animate-fadeIn">
                   {/* Registration Status Banner */}
-                  <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Registration Status:</span>
+                  <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800">
+                    <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Registration Status:</span>
                     <div className="flex items-center gap-2">
                       {isRegistered ? (
                         <>
@@ -388,7 +388,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       ) : (
                         <>
                           <AlertCircle className="w-4 h-4 text-amber-500" />
-                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px] sm:max-w-none">
+                          <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 truncate max-w-[120px] sm:max-w-none">
                             {registrationStatus || 'Unregistered'}
                           </span>
                         </>
@@ -410,7 +410,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {/* Server & Port */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
                       <div className="sm:col-span-2">
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">SIP Server / Domain</label>
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">SIP Server / Domain</label>
                         <input
                           type="text"
                           required
@@ -420,12 +420,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setServer(e.target.value)}
                           placeholder="sip.example.com"
                           className={`glass-input w-full px-3 py-2 rounded-xl text-xs font-mono font-medium outline-none ${
-                            !isSuperAdmin ? 'bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 cursor-not-allowed opacity-90' : ''
+                            !isSuperAdmin ? 'bg-zinc-100/60 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 cursor-not-allowed opacity-90' : ''
                           }`}
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Port</label>
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Port</label>
                         <input
                           type="number"
                           required
@@ -434,7 +434,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           readOnly={!isSuperAdmin}
                           onChange={(e) => setPort(Number(e.target.value))}
                           className={`glass-input w-full px-3 py-2 rounded-xl text-xs font-mono font-medium outline-none ${
-                            !isSuperAdmin ? 'bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 cursor-not-allowed opacity-90' : ''
+                            !isSuperAdmin ? 'bg-zinc-100/60 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 cursor-not-allowed opacity-90' : ''
                           }`}
                         />
                       </div>
@@ -443,7 +443,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {/* Username & Auth ID */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">SIP Username</label>
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">SIP Username</label>
                         <input
                           type="text"
                           required
@@ -453,12 +453,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setUsername(e.target.value)}
                           placeholder="101"
                           className={`glass-input w-full px-3 py-2 rounded-xl text-xs font-mono outline-none ${
-                            !isSuperAdmin ? 'bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 cursor-not-allowed opacity-90' : ''
+                            !isSuperAdmin ? 'bg-zinc-100/60 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 cursor-not-allowed opacity-90' : ''
                           }`}
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Auth ID</label>
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Auth ID</label>
                         <input
                           type="text"
                           value={authId}
@@ -467,7 +467,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setAuthId(e.target.value)}
                           placeholder="Leave blank for username"
                           className={`glass-input w-full px-3 py-2 rounded-xl text-xs font-mono outline-none ${
-                            !isSuperAdmin ? 'bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 cursor-not-allowed opacity-90' : ''
+                            !isSuperAdmin ? 'bg-zinc-100/60 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 cursor-not-allowed opacity-90' : ''
                           }`}
                         />
                       </div>
@@ -475,7 +475,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                     {/* Password Field */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">SIP Password</label>
+                      <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">SIP Password</label>
                       <div className="relative flex items-center">
                         <input
                           type={showPassword ? 'text' : 'password'}
@@ -485,13 +485,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••••••"
                           className={`glass-input w-full px-3 pr-10 py-2 rounded-xl text-xs font-mono outline-none ${
-                            !isSuperAdmin ? 'bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 cursor-not-allowed opacity-90' : ''
+                            !isSuperAdmin ? 'bg-zinc-100/60 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 cursor-not-allowed opacity-90' : ''
                           }`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                          className="absolute right-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                         >
                           {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                         </button>
@@ -500,7 +500,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                     {/* Transport Type */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Transport Protocol</label>
+                      <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Transport Protocol</label>
                       <div className="grid grid-cols-3 gap-2">
                         {(['tls', 'tcp', 'udp'] as const).map((t) => (
                           <button
@@ -511,7 +511,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             className={`py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
                               transport === t
                                 ? 'bg-brand-600 text-white shadow-xs'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                             } ${!isSuperAdmin ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer'}`}
                           >
                             {t}
@@ -522,7 +522,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                     {/* Form Action Buttons (Only visible to superadmin) */}
                     {isSuperAdmin ? (
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800">
                         {isRegistered ? (
                           <button
                             type="button"
@@ -542,7 +542,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <div className="pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 italic">
+                      <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-400 dark:text-zinc-500 italic">
                         Account parameters auto-provisioned from tenant profile.
                       </div>
                     )}
@@ -555,27 +555,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'account' && (
               <div className="space-y-3.5 sm:space-y-4 animate-fadeIn">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">User & Tenant Information</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Authenticated Cloud-PBX profile details</p>
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">User & Tenant Information</h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Authenticated Cloud-PBX profile details</p>
                 </div>
 
                 {authUser ? (
                   <div className="space-y-3">
                     {/* User & Role Card */}
-                    <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">Email / Identity</span>
-                        <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-mono truncate">{authUser.email}</span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium shrink-0">Email / Identity</span>
+                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono truncate">{authUser.email}</span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">Role</span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium shrink-0">Role</span>
                         <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-brand-500/10 text-brand-600 dark:text-brand-400">
                           {authUser.role}
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">Tenant</span>
-                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium shrink-0">Tenant</span>
+                        <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">
                           {authUser.tenant?.tenant_name} ({authUser.tenant?.tenant_code})
                         </span>
                       </div>
@@ -583,9 +583,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                     {/* Extension Card */}
                     {authUser.extension && (
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2">
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 space-y-2">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 shrink-0">
+                          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium flex items-center gap-1.5 shrink-0">
                             <Phone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                             Extension Number
                           </span>
@@ -594,8 +594,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">SIP Username</span>
-                          <span className="text-xs font-mono text-slate-700 dark:text-slate-300 truncate">
+                          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium shrink-0">SIP Username</span>
+                          <span className="text-xs font-mono text-zinc-700 dark:text-zinc-300 truncate">
                             {authUser.extension.sip_username}
                           </span>
                         </div>
@@ -604,14 +604,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                     {/* DIDs Card */}
                     {authUser.dids && authUser.dids.length > 0 && (
-                      <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2">
-                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                           Assigned Phone Numbers (DIDs)
                         </span>
                         <div className="space-y-1.5">
                           {authUser.dids.map((d) => (
                             <div key={d.id} className="flex items-center justify-between text-xs font-mono gap-2">
-                              <span className="text-slate-600 dark:text-slate-400 truncate">{d.name || d.did_name || 'Line'}</span>
+                              <span className="text-zinc-600 dark:text-zinc-400 truncate">{d.name || d.did_name || 'Line'}</span>
                               <span className="font-semibold text-brand-600 dark:text-brand-400 shrink-0">
                                 {d.number || d.did_number}
                               </span>
@@ -622,8 +622,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     )}
 
                     {/* Features Pill Row */}
-                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 flex items-center gap-2 flex-wrap">
-                      <span className="text-[11px] font-bold text-slate-500">Enabled Features:</span>
+                    <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold text-zinc-500">Enabled Features:</span>
                       {features.calling && (
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold">
                           Calling
@@ -647,7 +647,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 italic">Not signed into a Cloud-PBX user account.</p>
+                  <p className="text-xs text-zinc-500 italic">Not signed into a Cloud-PBX user account.</p>
                 )}
               </div>
             )}

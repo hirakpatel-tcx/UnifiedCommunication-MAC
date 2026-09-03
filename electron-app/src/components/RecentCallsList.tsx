@@ -170,26 +170,26 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
         <div className="flex items-center gap-2 shrink-0 mb-2 flex-wrap sm:flex-nowrap">
           {showSearch && (
             <div className="relative flex-1 min-w-[7rem]">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -tranzinc-y-1/2 text-zinc-400 pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search call logs..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1.5 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-800"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1.5 focus:ring-brand-500 focus:bg-white dark:focus:bg-zinc-800"
               />
             </div>
           )}
 
           {showFilter && (
             <div className="flex items-center gap-2 shrink-0">
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg text-xs shrink-0">
+              <div className="flex items-center bg-zinc-100 dark:bg-zinc-800/60 p-0.5 rounded-lg text-xs shrink-0">
                 <button
                   onClick={() => setStatusFilter('all')}
                   className={`px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
                     statusFilter === 'all'
-                      ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs'
-                      : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                      ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-2xs'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                   }`}
                 >
                   All
@@ -198,8 +198,8 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                   onClick={() => setStatusFilter('missed')}
                   className={`px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
                     statusFilter === 'missed'
-                      ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-2xs'
-                      : 'text-slate-500 hover:text-rose-500'
+                      ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-rose-400 shadow-2xs'
+                      : 'text-zinc-500 hover:text-rose-500'
                   }`}
                 >
                   Missed
@@ -216,7 +216,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                   className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium border transition-colors cursor-pointer ${
                     directionFilter !== 'all'
                       ? 'bg-brand-50 dark:bg-brand-950/40 border-brand-500/30 text-brand-700 dark:text-brand-300'
-                      : 'bg-slate-100 dark:bg-slate-800/60 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                      : 'bg-zinc-100 dark:bg-zinc-800/60 border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
                   }`}
                 >
                   {directionFilter === 'incoming' ? (
@@ -231,7 +231,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                 </button>
 
                 {isDirectionMenuOpen && (
-                  <div className="absolute top-full mt-1 left-0 z-30 w-36 rounded-xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-popIn p-1">
+                  <div className="absolute top-full mt-1 left-0 z-30 w-36 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-xl overflow-hidden animate-popIn p-1">
                     {(['all', 'incoming', 'outgoing'] as DirectionFilter[]).map((opt) => (
                       <button
                         key={opt}
@@ -242,7 +242,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                         className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                           directionFilter === opt
                             ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                            : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                            : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                         }`}
                       >
                         <span className="capitalize">{opt === 'all' ? 'All calls' : opt}</span>
@@ -263,7 +263,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                   className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium border transition-colors cursor-pointer ${
                     datePreset !== 'all'
                       ? 'bg-brand-50 dark:bg-brand-950/40 border-brand-500/30 text-brand-700 dark:text-brand-300'
-                      : 'bg-slate-100 dark:bg-slate-800/60 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                      : 'bg-zinc-100 dark:bg-zinc-800/60 border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
                   }`}
                 >
                   <Calendar className="w-3 h-3" />
@@ -272,7 +272,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                 </button>
 
                 {isDateMenuOpen && (
-                  <div className="absolute top-full mt-1 right-0 z-30 w-56 rounded-xl bg-white dark:bg-[#1E2330] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-popIn p-1">
+                  <div className="absolute top-full mt-1 right-0 z-30 w-56 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-xl overflow-hidden animate-popIn p-1">
                     {(Object.keys(DATE_PRESET_LABELS) as DatePreset[])
                       .filter((p) => p !== 'custom')
                       .map((opt) => (
@@ -285,7 +285,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors cursor-pointer ${
                             datePreset === opt
                               ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
-                              : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                              : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
                           }`}
                         >
                           <span>{DATE_PRESET_LABELS[opt]}</span>
@@ -293,10 +293,10 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                         </button>
                       ))}
 
-                    <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1.5 px-1.5 pb-1.5">
+                    <div className="border-t border-zinc-100 dark:border-zinc-800 mt-1 pt-1.5 px-1.5 pb-1.5">
                       <p
                         className={`text-[11px] font-medium mb-1.5 ${
-                          datePreset === 'custom' ? 'text-brand-700 dark:text-brand-300' : 'text-slate-500 dark:text-slate-400'
+                          datePreset === 'custom' ? 'text-brand-700 dark:text-brand-300' : 'text-zinc-500 dark:text-zinc-400'
                         }`}
                       >
                         Custom range
@@ -309,7 +309,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                             setCustomStart(e.target.value);
                             setDatePreset('custom');
                           }}
-                          className="w-full px-2 py-1 text-[11px] rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                          className="w-full px-2 py-1 text-[11px] rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
                         />
                         <input
                           type="date"
@@ -318,7 +318,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                             setCustomEnd(e.target.value);
                             setDatePreset('custom');
                           }}
-                          className="w-full px-2 py-1 text-[11px] rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                          className="w-full px-2 py-1 text-[11px] rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
                         />
                       </div>
                     </div>
@@ -330,12 +330,12 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80 min-h-0">
+      <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800/80 min-h-0">
         {filteredHistory.length === 0 ? (
-          <div className="h-full min-h-[260px] flex flex-col items-center justify-center text-center text-slate-400 text-xs">
-            <Clock className="w-10 h-10 mb-2 text-slate-300 dark:text-slate-700 stroke-[1.5]" />
-            <p className="font-semibold text-slate-600 dark:text-slate-300">No call records found</p>
-            <p className="text-slate-400 text-[11px]">Completed and missed calls will appear here</p>
+          <div className="h-full min-h-[260px] flex flex-col items-center justify-center text-center text-zinc-400 text-xs">
+            <Clock className="w-10 h-10 mb-2 text-zinc-300 dark:text-zinc-700 stroke-[1.5]" />
+            <p className="font-semibold text-zinc-600 dark:text-zinc-300">No call records found</p>
+            <p className="text-zinc-400 text-[11px]">Completed and missed calls will appear here</p>
           </div>
         ) : (
           filteredHistory.map((item) => {
@@ -346,7 +346,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
             return (
               <div
                 key={item.id}
-                className="py-2.5 px-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl transition-colors group"
+                className="py-2.5 px-3 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-xl transition-colors group"
               >
                 <button
                   onClick={() => (onSelectNumber || onCall)(num)}
@@ -371,16 +371,16 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                      <p className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-100 truncate">
                         {item.display_name || num}
                       </p>
                       {item.display_name && (
-                        <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
+                        <span className="text-[11px] font-mono text-zinc-400 hidden sm:inline">
                           ({num})
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+                    <p className="text-[11px] text-zinc-400 flex items-center gap-2 mt-0.5">
                       <span>
                         {new Date(item.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })} at{' '}
                         {new Date(item.timestamp).toLocaleTimeString([], {
@@ -389,7 +389,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                         })}
                       </span>
                       {item.duration > 0 && <span>• {item.duration}s</span>}
-                      <span className="capitalize text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 dark:bg-slate-800 font-medium">
+                      <span className="capitalize text-[10px] px-1.5 py-0.2 rounded-md bg-zinc-100 dark:bg-zinc-800 font-medium">
                         {item.status}
                       </span>
                     </p>
@@ -401,7 +401,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                     <button
                       onClick={() => onMessage?.(num)}
                       title={`Message ${num}`}
-                      className="p-2 rounded-xl text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-colors cursor-pointer"
+                      className="p-2 rounded-xl text-zinc-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-colors cursor-pointer"
                     >
                       <MessageSquare className="w-4 h-4" />
                     </button>
@@ -409,7 +409,7 @@ export const RecentCallsList: React.FC<RecentCallsListProps> = ({
                   <button
                     onClick={() => onCall(num)}
                     title={`Call ${num}`}
-                    className="p-2 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
                   >
                     <Phone className="w-4 h-4" />
                   </button>

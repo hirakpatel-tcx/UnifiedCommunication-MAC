@@ -65,7 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   navItems.push({ id: 'contacts', label: 'Contacts', icon: Users });
 
   return (
-    <aside className="hidden md:flex w-16 md:w-18 flex-col items-center justify-between py-2.5 border-r border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-20 select-none transition-colors shrink-0">
+    <aside className="hidden md:flex w-16 md:w-18 flex-col items-center justify-between py-2.5 border-r border-zinc-200 dark:border-zinc-800/80 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md z-20 select-none transition-colors shrink-0">
       {/* Top Section: Navigation Items */}
       <nav className="flex flex-col items-center gap-1 w-full px-1.5 overflow-y-auto no-scrollbar py-0.5">
         {navItems.map((item) => {
@@ -79,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`relative flex flex-col items-center justify-center w-12 h-11 rounded-xl transition-all duration-150 cursor-pointer shrink-0 ${
                 isActive
                   ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80'
               }`}
             >
               <Icon className="w-4.5 h-4.5" fill="none" />
@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Bottom Section: Utility Actions (Terminal & Settings) */}
-      <div className="flex flex-col items-center gap-1.5 w-full px-2 pb-1 shrink-0 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+      <div className="flex flex-col items-center gap-1.5 w-full px-2 pb-1 shrink-0 pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
         {/* Live SIP Log Console Trigger */}
         <button
           onClick={onOpenLogs}
@@ -100,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className={`p-2 rounded-xl transition-colors cursor-pointer ${
             isLogsOpen
               ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
           }`}
         >
           <Terminal className="w-4 h-4" />
@@ -110,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={onOpenSettings}
           title="Preferences & Settings (Audio, Themes, SIP)"
-          className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="relative p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
           <Settings className="w-4 h-4" />
           {isRegistered !== undefined && (

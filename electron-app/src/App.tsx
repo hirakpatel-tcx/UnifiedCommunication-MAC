@@ -673,17 +673,14 @@ export const App: React.FC = () => {
   }
 
   const user = authSession.user;
-  console.log(user)
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim();
   const displayName = fullName || user.email.split('@')[0];
-  console.log(fullName)
-  console.log(displayName);
   const extensionNum = user.extension?.extension_number || currentAccount?.username || 'hirakpatel';
 
   return (
-    <div className="relative flex flex-col h-screen w-screen bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 overflow-hidden select-none transition-colors duration-200">
+    <div className="relative flex flex-col h-screen w-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-hidden select-none transition-colors duration-200">
       {/* Top Full-Width Window Titlebar & Header */}
-      <header className="titlebar-drag flex items-center justify-between px-3 md:px-4 h-11 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-md z-30 shrink-0">
+      <header className="titlebar-drag flex items-center justify-between px-3 md:px-4 h-11 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/70 backdrop-blur-md z-30 shrink-0">
         {/* Left Branding / macOS Traffic Lights Area */}
         <div className="flex items-center min-w-0 gap-2">
           {/* macOS Traffic Lights Clearance Spacer: 72px in windowed/maximized mode, 0 in native fullscreen */}
@@ -693,7 +690,7 @@ export const App: React.FC = () => {
 
           {/* TCX Connect App Title */}
           <div className="flex items-center gap-2 select-none py-1">
-            <span className="font-bold text-xs tracking-tight text-slate-800 dark:text-slate-200">
+            <span className="font-bold text-xs tracking-tight text-zinc-800 dark:text-zinc-200">
               TCX Connect
             </span>
             <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 font-semibold font-mono">
@@ -709,7 +706,7 @@ export const App: React.FC = () => {
             title="Live SIP Log Console"
             className={`md:hidden p-1.5 rounded-xl transition-colors cursor-pointer ${isLogDrawerOpen
               ? 'bg-brand-600/20 text-brand-600 dark:text-brand-300'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
           >
             <Terminal className="w-4 h-4" />
@@ -719,7 +716,7 @@ export const App: React.FC = () => {
           <button
             onClick={() => handleOpenSettings('audio')}
             title="Preferences & Settings (Audio, Themes, SIP)"
-            className="md:hidden relative p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="md:hidden relative p-1.5 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <Settings className="w-4 h-4" />
             <span
@@ -789,8 +786,8 @@ export const App: React.FC = () => {
             {calls.filter((c) => [999, 998].includes(c.call_id)).length >= 2
               ? 'End Demo Calls'
               : calls.some((c) => [999, 998].includes(c.call_id))
-              ? 'Add 2nd Demo Call'
-              : 'Demo Call'}
+                ? 'Add 2nd Demo Call'
+                : 'Demo Call'}
           </button>
 
           {/* User Profile Badge with Live Presence Indicator */}
@@ -799,11 +796,11 @@ export const App: React.FC = () => {
             title={isRegistered ? `${displayName} (${presence})` : isDaemonRunning ? registrationStatus || 'Unregistered' : 'Connecting to PJSIP...'}
             className="relative group p-0.5 rounded-xl transition-transform hover:scale-105 cursor-pointer ml-1"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-brand-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
               {(displayName || 'HP').slice(0, 2).toUpperCase()}
             </div>
             <span
-              className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 ${isRegistered
+              className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-zinc-900 ${isRegistered
                 ? presence === 'available'
                   ? 'bg-emerald-500 ring-1 ring-emerald-500/40'
                   : presence === 'busy' || presence === 'dnd'
@@ -811,7 +808,7 @@ export const App: React.FC = () => {
                     : 'bg-amber-400 ring-1 ring-amber-400/40'
                 : registrationStatus.toLowerCase().includes('reg')
                   ? 'bg-amber-400 animate-pulse'
-                  : 'bg-slate-400'
+                  : 'bg-zinc-400'
                 }`}
             />
           </button>
@@ -919,14 +916,14 @@ export const App: React.FC = () => {
                   activeCall={
                     focusedCall
                       ? {
-                          callId: focusedCall.call_id,
-                          remoteUri: focusedCall.remote_uri,
-                          state: focusedCall.state,
-                          reason: focusedCall.reason,
-                          lastStatus: focusedCall.last_status,
-                          isMuted: isCallMuted,
-                          isOnHold: isCallOnHold,
-                        }
+                        callId: focusedCall.call_id,
+                        remoteUri: focusedCall.remote_uri,
+                        state: focusedCall.state,
+                        reason: focusedCall.reason,
+                        lastStatus: focusedCall.last_status,
+                        isMuted: isCallMuted,
+                        isOnHold: isCallOnHold,
+                      }
                       : null
                   }
                   calls={calls.map((c) => ({
@@ -1010,7 +1007,7 @@ export const App: React.FC = () => {
       {/* Incoming Call Alert Modal */}
       {incomingCall && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-          <div className="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-emerald-500/40 text-center animate-bounce-subtle bg-white dark:bg-slate-900">
+          <div className="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-emerald-500/40 text-center animate-bounce-subtle bg-white dark:bg-zinc-900">
             <div className="relative flex items-center justify-center w-24 h-24 mx-auto mb-4">
               <div className="absolute inset-0 rounded-full bg-emerald-500/30 animate-ping"></div>
               <div className="relative z-10 flex items-center justify-center w-18 h-18 rounded-full bg-emerald-600 text-white shadow-xl shadow-emerald-500/40">
@@ -1018,7 +1015,7 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">Incoming Call</h3>
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">Incoming Call</h3>
             <p className="text-sm font-mono text-emerald-600 dark:text-emerald-400 mb-6 truncate">
               {incomingCall.remote_uri.replace(/^sip:/i, '')}
             </p>
@@ -1046,11 +1043,11 @@ export const App: React.FC = () => {
 
       {/* Live SIP Log Console Drawer */}
       {isLogDrawerOpen && (
-        <div className="absolute bottom-0 inset-x-0 h-64 bg-slate-950/95 border-t border-slate-800 backdrop-blur-xl z-40 flex flex-col shadow-2xl animate-fadeIn">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-slate-800/80 bg-slate-900/50">
+        <div className="absolute bottom-0 inset-x-0 h-64 bg-zinc-950/95 border-t border-zinc-800 backdrop-blur-xl z-40 flex flex-col shadow-2xl animate-fadeIn">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-800/80 bg-zinc-900/50">
             <div className="flex items-center gap-2">
               <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="text-xs font-mono font-semibold text-slate-300">Live PJSIP / SIP Logs</span>
+              <span className="text-xs font-mono font-semibold text-zinc-300">Live PJSIP / SIP Logs</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 font-mono">
                 {logs.length} lines
               </span>
@@ -1059,22 +1056,22 @@ export const App: React.FC = () => {
               <button
                 onClick={() => setLogs([])}
                 title="Clear Logs"
-                className="p-1 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                className="p-1 text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setIsLogDrawerOpen(false)}
                 title="Close Drawer"
-                className="p-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                className="p-1 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
-          <div className="flex-1 p-2.5 overflow-y-auto font-mono text-[11px] leading-relaxed text-slate-300 space-y-0.5 selection:bg-indigo-500/30">
+          <div className="flex-1 p-2.5 overflow-y-auto font-mono text-[11px] leading-relaxed text-zinc-300 space-y-0.5 selection:bg-indigo-500/30">
             {logs.length === 0 ? (
-              <p className="text-slate-500 italic">No logs received yet. SIP events will appear here in real time...</p>
+              <p className="text-zinc-500 italic">No logs received yet. SIP events will appear here in real time...</p>
             ) : (
               logs.map((line, idx) => (
                 <div key={idx} className="whitespace-pre-wrap break-all hover:bg-white/[0.03] px-1 rounded">

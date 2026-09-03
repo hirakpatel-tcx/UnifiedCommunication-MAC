@@ -104,11 +104,11 @@ export const Contacts: React.FC<ContactsProps> = ({
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full min-h-0 select-none animate-fadeIn rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs p-3 sm:p-4">
+    <div className="flex flex-col flex-1 w-full min-h-0 select-none animate-fadeIn rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs p-3 sm:p-4">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-800">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Directory</h2>
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Directory</h2>
         </div>
 
         <button
@@ -127,32 +127,32 @@ export const Contacts: React.FC<ContactsProps> = ({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, department, or extension..."
-          className="glass-input w-full pl-8 pr-3 py-2 rounded-xl text-xs text-slate-800 dark:text-slate-200 outline-none"
+          className="glass-input w-full pl-8 pr-3 py-2 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none"
         />
-        <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400" />
+        <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-zinc-400" />
       </div>
 
       {/* Contacts List */}
       <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
         {filtered.length === 0 ? (
-          <p className="text-center text-xs text-slate-400 dark:text-slate-500 py-8">
+          <p className="text-center text-xs text-zinc-400 dark:text-zinc-500 py-8">
             No contacts found.
           </p>
         ) : (
           filtered.map((c) => (
             <div
               key={c.id}
-              className="group flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 hover:border-brand-500/40 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all shadow-xs"
+              className="group flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-brand-500/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/20 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/20 flex items-center justify-center font-bold text-sm">
                   {c.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                     {c.name}
                   </h4>
-                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-mono">
+                  <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-mono">
                     <span>{c.number}</span>
                     {c.company && (
                       <>
@@ -170,7 +170,7 @@ export const Contacts: React.FC<ContactsProps> = ({
                 <button
                   onClick={() => onCall(c.number)}
                   title={`Call ${c.name}`}
-                  className="p-2 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
                 >
                   <Phone className="w-4 h-4" />
                 </button>
@@ -178,7 +178,7 @@ export const Contacts: React.FC<ContactsProps> = ({
                   <button
                     onClick={() => onMessage?.(c.number)}
                     title={`Message ${c.name}`}
-                    className="p-2 rounded-xl text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-colors cursor-pointer"
                   >
                     <MessageSquare className="w-4 h-4" />
                   </button>
@@ -186,14 +186,14 @@ export const Contacts: React.FC<ContactsProps> = ({
                 <button
                   onClick={() => handleStartEdit(c)}
                   title={`Edit ${c.name}`}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => onDeleteContact(c.id)}
                   title="Delete Contact"
-                  className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -211,15 +211,15 @@ export const Contacts: React.FC<ContactsProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md max-h-[85vh] flex flex-col rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl animate-popIn overflow-hidden"
+            className="w-full max-w-md max-h-[85vh] flex flex-col rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-popIn overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 shrink-0">
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                 {editingId ? 'Edit Contact' : 'Add Contact'}
               </h3>
               <button
                 onClick={resetForm}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -247,7 +247,7 @@ export const Contacts: React.FC<ContactsProps> = ({
               {/* Contact Numbers */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <label className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                     Contact Number(s) *
                   </label>
                   <button
@@ -285,7 +285,7 @@ export const Contacts: React.FC<ContactsProps> = ({
                         type="button"
                         onClick={() => handleRemoveNumberField(i)}
                         title="Remove number"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -313,7 +313,7 @@ export const Contacts: React.FC<ContactsProps> = ({
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer"
                 >
                   Cancel
                 </button>

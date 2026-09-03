@@ -45,7 +45,7 @@ export const LineSwitcher: React.FC<LineSwitcherProps> = ({ calls, focusedCallId
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-colors cursor-pointer max-w-[9.5rem] ${
               isFocused
                 ? 'bg-brand-50 dark:bg-brand-950/50 border-brand-300 dark:border-brand-700 text-brand-700 dark:text-brand-300'
-                : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 opacity-80'
+                : 'bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/60 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 opacity-80'
             }`}
           >
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${lineStatusDotClass(call)}`} />
