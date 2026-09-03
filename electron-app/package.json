@@ -4,11 +4,11 @@
   "description": "Production-grade VoIP Desktop Softphone powered by Electron, React, and PJSIP 2.17",
   "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "concurrently -k -n \"VITE,ELEC\" -c \"blue,green\" \"vite --host\" \"wait-on tcp:5173 && npm run electron:dev\"",
+    "dev": "concurrently -k -n \"VITE,ELEC\" -c \"blue,green\" \"vite --host\" \"wait-on tcp:5173 && bun run electron:dev\"",
     "build": "tsc && vite build && tsc -p tsconfig.electron.json",
     "electron:dev": "tsc -p tsconfig.electron.json && electron .",
-    "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder"
+    "pack": "bun run build && electron-builder --dir",
+    "dist": "bun run build && electron-builder"
   },
   "dependencies": {
     "clsx": "^2.1.1",
